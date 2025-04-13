@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baholar | O'quvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../student-language.js"></script>
+    <style>
+        .main-content {
+            background-image: url('../images/student-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .data-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table th {
+            background-color: #f9f9f9;
+            color: #2c3e50;
+            font-weight: 600;
+            text-align: left;
+            padding: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        
+        .data-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+        
+        .data-table tr:hover td {
+            background-color: #f5f9ff;
+        }
+        
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .grade-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .grade-high {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        
+        .grade-mid {
+            color: #f39c12;
+            font-weight: bold;
+        }
+        
+        .grade-low {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        
+        .info-text {
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            margin-bottom: 20px;
+            border-left: 4px solid #3498db;
+            color: #2c3e50;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .grade-stats {
+                flex-direction: column;
+            }
+            
+            .filter-section {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animatsiya */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .grade-stats, .filter-section, .data-table {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="studentTab">O'quvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="grades.html"><i class="material-icons">grade</i> <span data-translate="grades">Baholar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="myGrades">Baholarim</h1>
+            
+            <div class="grade-stats">
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="averageGrade">O'rtacha ball</div>
+                    <div class="stat-number" id="avgGrade">0.0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="highestGrade">Eng yuqori ball</div>
+                    <div class="stat-number" id="highestGrade">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="lowestGrade">Eng past ball</div>
+                    <div class="stat-number" id="lowestGrade">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="totalGrades">Jami baholar</div>
+                    <div class="stat-number" id="totalGrades">0</div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="subjectFilter" data-translate="filterBySubject">Fan bo'yicha</label>
+                    <select id="subjectFilter">
+                        <option value="all" data-translate="allSubjects">Barcha fanlar</option>
+                        <!-- Fanlar JavaScript orqali qo'shiladi -->
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="periodFilter" data-translate="filterByPeriod">Davr bo'yicha</label>
+                    <select id="periodFilter">
+                        <option value="all" data-translate="allPeriods">Barcha davrlar</option>
+                        <option value="month" data-translate="lastMonth">Oxirgi oy</option>
+                        <option value="quarter" data-translate="lastQuarter">Oxirgi chorak</option>
+                        <option value="year" data-translate="currentYear">Joriy yil</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="gradeFilter" data-translate="filterByGrade">Baho bo'yicha</label>
+                    <select id="gradeFilter">
+                        <option value="all" data-translate="allGrades">Barcha baholar</option>
+                        <option value="high" data-translate="highGrades">Yuqori (5)</option>
+                        <option value="mid" data-translate="midGrades">O'rta (3-4)</option>
+                        <option value="low" data-translate="lowGrades">Past (1-2)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-translate="subject">FAN</th>
+                            <th data-translate="grade">BAHO</th>
+                            <th data-translate="teacher">O'QITUVCHI</th>
+                            <th data-translate="notes">IZOH</th>
+                            <th data-translate="date">SANA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gradesList">
+                        <!-- Baholar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // O'quvchining joriy sessiyasi - localStorage'dan olish
+            const currentStudentId = localStorage.getItem('currentStudentId');
+            if (!currentStudentId) {
+                alert('Tizimga kirish xatosi! Login sahifasiga qaytarilmoqdasiz.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // O'quvchi ma'lumotlarini olish
+            const students = getFromStorage('students');
+            const currentStudent = students.find(s => s.id == currentStudentId);
+            
+            if (!currentStudent) {
+                alert('O\'quvchi ma\'lumotlari topilmadi! Login sahifasiga qaytarilmoqdasiz.');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Ma'lumotlarni yuklash
+            loadStudentGrades(currentStudent);
+            setupFilters();
+            
+            // Filtrlash hodisasi
+            document.getElementById('subjectFilter').addEventListener('change', applyFilters);
+            document.getElementById('periodFilter').addEventListener('change', applyFilters);
+            document.getElementById('gradeFilter').addEventListener('change', applyFilters);
+        });
+        
+        // Sanani chiroyli ko'rinishda ko'rsatish
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('uz-UZ', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // O'quvchining baholarini yuklash
+        function loadStudentGrades(currentStudent) {
+            const grades = getFromStorage('grades') || [];
+            const studentGrades = grades.filter(grade => grade.studentId === currentStudent.id);
+            
+            // Statistikani ko'rsatish
+            showGradeStatistics(studentGrades);
+            
+            // Baholarni ko'rsatish
+            displayGrades(studentGrades);
+        }
+
+        // Baho statistikalarini ko'rsatish
+        function showGradeStatistics(grades) {
+            if (grades.length === 0) {
+                document.getElementById('avgGrade').textContent = '0.0';
+                document.getElementById('highestGrade').textContent = '0';
+                document.getElementById('lowestGrade').textContent = '0';
+                document.getElementById('totalGrades').textContent = '0';
+                return;
+            }
+            
+            // O'rtacha baho
+            const sum = grades.reduce((total, grade) => total + parseInt(grade.grade), 0);
+            const avg = (sum / grades.length).toFixed(1);
+            document.getElementById('avgGrade').textContent = avg;
+            
+            // Eng yuqori baho
+            const highest = Math.max(...grades.map(grade => parseInt(grade.grade)));
+            document.getElementById('highestGrade').textContent = highest;
+            
+            // Eng past baho
+            const lowest = Math.min(...grades.map(grade => parseInt(grade.grade)));
+            document.getElementById('lowestGrade').textContent = lowest;
+            
+            // Jami baholar soni
+            document.getElementById('totalGrades').textContent = grades.length;
+        }
+
+        // Baholarni ko'rsatish
+        function displayGrades(grades) {
+            const tbody = document.getElementById('gradesList');
+            tbody.innerHTML = '';
+            
+            if (grades.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="5" class="no-data">Baholar mavjud emas</td>';
+                tbody.appendChild(row);
+                return;
+            }
+            
+            // Teachers ma'lumotlarini olish
+            const teachers = getFromStorage('teachers');
+            
+            // Sanaga ko'ra tartiblash (eng oxirgilarini olish uchun)
+            const sortedGrades = [...grades].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            sortedGrades.forEach(grade => {
+                const row = document.createElement('tr');
+                
+                // O'qituvchi nomini topish
+                const teacher = teachers.find(t => t.id === grade.teacherId);
+                const teacherName = teacher ? teacher.name : 'Noma\'lum';
+                
+                // Baho uchun chiroyli ko'rinish
+                let gradeClass;
+                if (grade.grade >= 5) {
+                    gradeClass = 'grade-high';
+                } else if (grade.grade >= 3) {
+                    gradeClass = 'grade-mid';
+                } else {
+                    gradeClass = 'grade-low';
+                }
+                
+                row.innerHTML = `
+                    <td>${grade.subject}</td>
+                    <td class="${gradeClass}">${grade.grade}</td>
+                    <td>${teacherName}</td>
+                    <td>${grade.notes || '-'}</td>
+                    <td>${formatDate(grade.date)}</td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Filtrlash sozlamalarini o'rnatish
+        function setupFilters() {
+            // Fan filterlari uchun mavjud fanlarni olish
+            const grades = getFromStorage('grades') || [];
+            const subjects = [...new Set(grades.map(grade => grade.subject))];
+            
+            // Fanlar ro'yxatini to'ldirish
+            const subjectFilter = document.getElementById('subjectFilter');
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectFilter.appendChild(option);
+            });
+        }
+
+        // Filtrlash mantiqini qo'llash
+        function applyFilters() {
+            const currentStudentId = localStorage.getItem('currentStudentId');
+            const grades = getFromStorage('grades') || [];
+            let studentGrades = grades.filter(grade => grade.studentId === currentStudentId);
+            
+            // Fan bo'yicha filtrlash
+            const subjectFilter = document.getElementById('subjectFilter').value;
+            if (subjectFilter !== 'all') {
+                studentGrades = studentGrades.filter(grade => grade.subject === subjectFilter);
+            }
+            
+            // Davr bo'yicha filtrlash
+            const periodFilter = document.getElementById('periodFilter').value;
+            const now = new Date();
+            
+            if (periodFilter === 'month') {
+                const oneMonthAgo = new Date();
+                oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+                studentGrades = studentGrades.filter(grade => new Date(grade.date) >= oneMonthAgo);
+            } else if (periodFilter === 'quarter') {
+                const threeMonthsAgo = new Date();
+                threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+                studentGrades = studentGrades.filter(grade => new Date(grade.date) >= threeMonthsAgo);
+            } else if (periodFilter === 'year') {
+                const startOfYear = new Date(now.getFullYear(), 0, 1);
+                studentGrades = studentGrades.filter(grade => new Date(grade.date) >= startOfYear);
+            }
+            
+            // Baho bo'yicha filtrlash
+            const gradeFilter = document.getElementById('gradeFilter').value;
+            
+            if (gradeFilter === 'high') {
+                studentGrades = studentGrades.filter(grade => parseInt(grade.grade) >= 5);
+            } else if (gradeFilter === 'mid') {
+                studentGrades = studentGrades.filter(grade => parseInt(grade.grade) >= 3 && parseInt(grade.grade) <= 4);
+            } else if (gradeFilter === 'low') {
+                studentGrades = studentGrades.filter(grade => parseInt(grade.grade) <= 2);
+            }
+            
+            // Baholarni ko'rsatish
+            displayGrades(studentGrades);
+            
+            // Statistikani yangilash
+            showGradeStatistics(studentGrades);
+        }
+    </script>
+</body>
+</html> 

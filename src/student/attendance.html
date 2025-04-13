@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Davomat | O'quvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../student-language.js"></script>
+    <style>
+        .main-content {
+            background-image: url('../images/student-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+        }
+        
+        /* Language selector styles */
+        .language-selector-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .language-selector {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-selector label {
+            margin-right: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .language-selector select {
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        
+        .attendance-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+        
+        .stat-card:first-child .stat-number {
+            color: #27ae60;
+        }
+        
+        .stat-card:nth-child(2) .stat-number {
+            color: #e74c3c;
+        }
+        
+        .stat-card:nth-child(3) .stat-number {
+            color: #f39c12;
+        }
+        
+        .stat-card:last-child .stat-number {
+            color: #3498db;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .calendar-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calendar-nav button {
+            background: #f8f9fa;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 15px;
+            cursor: pointer;
+            color: #2c3e50;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .calendar-nav button:hover {
+            background: #e9ecef;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+        }
+        
+        .calendar-day-header {
+            font-weight: 600;
+            text-align: center;
+            color: #7f8c8d;
+            padding: 10px 0;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            background: #f8f9fa;
+        }
+        
+        .calendar-day:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .calendar-day .date {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .calendar-day .status {
+            font-size: 0.8rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: 500;
+        }
+        
+        .calendar-day.present {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid #2ecc71;
+        }
+        
+        .calendar-day.present .status {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        .calendar-day.absent {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid #e74c3c;
+        }
+        
+        .calendar-day.absent .status {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .calendar-day.late {
+            background-color: rgba(243, 156, 18, 0.1);
+            border: 1px solid #f39c12;
+        }
+        
+        .calendar-day.late .status {
+            background-color: #f39c12;
+            color: white;
+        }
+        
+        .calendar-day.empty {
+            background-color: #f8f9fa;
+            border: 1px dashed #ddd;
+            cursor: default;
+        }
+        
+        .calendar-day.empty:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .calendar-day.today {
+            border: 2px solid #3498db;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .attendance-stats, .filter-section, .calendar-container {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="studentTab">O'quvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="material-icons">dashboard</i>
+                            <span data-translate="home">Bosh sahifa</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="grades.html">
+                            <i class="material-icons">grade</i>
+                            <span data-translate="grades">Baholar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="attendance.html">
+                            <i class="material-icons">event_note</i>
+                            <span data-translate="attendance">Davomat</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html">
+                            <i class="material-icons">campaign</i>
+                            <span data-translate="announcements">E'lonlar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html">
+                            <i class="material-icons">logout</i>
+                            <span data-translate="logout">Chiqish</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="attendance">Davomat</h1>
+            
+            <!-- Language selector visible at top-right -->
+            <div class="language-selector-wrapper">
+                <div class="language-selector">
+                    <label data-translate="languageLabel">Til:</label>
+                    <select id="language-select" onchange="changeLanguage(this.value)">
+                        <option value="uz">O'zbekcha</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="attendance-stats">
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="presentCount">Qatnashilgan kunlar</div>
+                    <div class="stat-number" id="presentDays">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="absentCount">Qatnashilmagan kunlar</div>
+                    <div class="stat-number" id="absentDays">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="lateCount">Kechikishlar</div>
+                    <div class="stat-number" id="lateDays">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label" data-translate="attendancePercentage">Qatnashish foizi</div>
+                    <div class="stat-number" id="attendancePercentage">0%</div>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="monthFilter" data-translate="monthFilter">Oy bo'yicha</label>
+                    <select id="monthFilter">
+                        <option value="0" data-translate="january">Yanvar</option>
+                        <option value="1" data-translate="february">Fevral</option>
+                        <option value="2" data-translate="march">Mart</option>
+                        <option value="3" data-translate="april">Aprel</option>
+                        <option value="4" data-translate="may">May</option>
+                        <option value="5" data-translate="june">Iyun</option>
+                        <option value="6" data-translate="july">Iyul</option>
+                        <option value="7" data-translate="august">Avgust</option>
+                        <option value="8" data-translate="september">Sentabr</option>
+                        <option value="9" data-translate="october">Oktabr</option>
+                        <option value="10" data-translate="november">Noyabr</option>
+                        <option value="11" data-translate="december">Dekabr</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="yearFilter" data-translate="yearFilter">Yil bo'yicha</label>
+                    <select id="yearFilter">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="statusFilter" data-translate="statusFilter">Holat bo'yicha</label>
+                    <select id="statusFilter">
+                        <option value="all" data-translate="allStatus">Barcha holatlar</option>
+                        <option value="present" data-translate="present">Keldi</option>
+                        <option value="absent" data-translate="absent">Kelmadi</option>
+                        <option value="late" data-translate="late">Kechikdi</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="calendar-container">
+                <div class="calendar-header">
+                    <div class="calendar-title" id="calendarTitle">Mart 2025</div>
+                    <div class="calendar-nav">
+                        <button id="prevMonth" data-translate="previous">« Oldingi</button>
+                        <button id="nextMonth" data-translate="next">Keyingi »</button>
+                    </div>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <!-- Calendar will be generated by JavaScript -->
+                </div>
+            </div>
+            
+            <h2>Batafsil ma'lumotlar</h2>
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>SANA</th>
+                            <th>HOLAT</th>
+                            <th>IZOH</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceList">
+                        <!-- Davomat ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define translations for student attendance-specific elements
+        const attendanceTranslations = {
+            uz: {
+                presentCount: "Qatnashilgan kunlar",
+                absentCount: "Qatnashilmagan kunlar",
+                lateCount: "Kechikishlar",
+                attendancePercentage: "Qatnashish foizi",
+                monthFilter: "Oy bo'yicha",
+                yearFilter: "Yil bo'yicha",
+                statusFilter: "Holat bo'yicha",
+                allStatus: "Barcha holatlar",
+                january: "Yanvar",
+                february: "Fevral",
+                march: "Mart",
+                april: "Aprel",
+                may: "May",
+                june: "Iyun",
+                july: "Iyul",
+                august: "Avgust",
+                september: "Sentabr",
+                october: "Oktabr",
+                november: "Noyabr",
+                december: "Dekabr",
+                present: "Keldi",
+                absent: "Kelmadi",
+                late: "Kechikdi",
+                previous: "« Oldingi",
+                next: "Keyingi »"
+            },
+            ru: {
+                presentCount: "Дни присутствия",
+                absentCount: "Дни отсутствия",
+                lateCount: "Опоздания",
+                attendancePercentage: "Процент посещаемости",
+                monthFilter: "По месяцу",
+                yearFilter: "По году",
+                statusFilter: "По статусу",
+                allStatus: "Все статусы",
+                january: "Январь",
+                february: "Февраль",
+                march: "Март",
+                april: "Апрель",
+                may: "Май",
+                june: "Июнь",
+                july: "Июль",
+                august: "Август",
+                september: "Сентябрь",
+                october: "Октябрь",
+                november: "Ноябрь",
+                december: "Декабрь",
+                present: "Присутствовал",
+                absent: "Отсутствовал",
+                late: "Опоздал",
+                previous: "« Предыдущий",
+                next: "Следующий »"
+            },
+            en: {
+                presentCount: "Present Days",
+                absentCount: "Absent Days",
+                lateCount: "Late Arrivals",
+                attendancePercentage: "Attendance Percentage",
+                monthFilter: "By Month",
+                yearFilter: "By Year",
+                statusFilter: "By Status",
+                allStatus: "All Statuses",
+                january: "January",
+                february: "February",
+                march: "March",
+                april: "April",
+                may: "May",
+                june: "June",
+                july: "July",
+                august: "August",
+                september: "September",
+                october: "October",
+                november: "November",
+                december: "December",
+                present: "Present",
+                absent: "Absent",
+                late: "Late",
+                previous: "« Previous",
+                next: "Next »"
+            }
+        };
+        
+        // Make sure these translations are added to the global translations
+        for (let lang in attendanceTranslations) {
+            for (let key in attendanceTranslations[lang]) {
+                if (!allTranslations[lang][key]) {
+                    allTranslations[lang][key] = attendanceTranslations[lang][key];
+                }
+            }
+        }
+        
+        // Set up the language selection based on stored preference
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current language from localStorage or default to Uzbek
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Set the language dropdown to the current language
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLang;
+            }
+            
+            // Apply translations
+            applyTranslations();
+            
+            // Force translate elements that might not be covered by the global translation
+            applyAttendanceTranslations();
+            
+            // Initialize the attendance calendar
+            initializeCalendar();
+        });
+        
+        // Function to change language
+        function changeLanguage(lang) {
+            // Store the selected language
+            localStorage.setItem('selectedLanguage', lang);
+            
+            // Apply translations
+            if (typeof applyTranslations === 'function') {
+                applyTranslations();
+            }
+            
+            // Apply attendance-specific translations
+            applyAttendanceTranslations();
+            
+            // Refresh the page to apply all translations properly
+            location.reload();
+        }
+        
+        // Function to apply attendance-specific translations
+        function applyAttendanceTranslations() {
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Apply translations to elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                
+                // Only apply if we have a translation for this key
+                if (attendanceTranslations[currentLang] && attendanceTranslations[currentLang][key]) {
+                    element.textContent = attendanceTranslations[currentLang][key];
+                }
+            });
+            
+            // Update the calendar title
+            updateCalendarTitle();
+        }
+        
+        // Update calendar title based on selected month and year
+        function updateCalendarTitle() {
+            const monthSelect = document.getElementById('monthFilter');
+            const yearSelect = document.getElementById('yearFilter');
+            const calendarTitle = document.getElementById('calendarTitle');
+            
+            if (monthSelect && yearSelect && calendarTitle) {
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                const monthOption = monthSelect.options[monthSelect.selectedIndex];
+                const monthName = attendanceTranslations[currentLang][monthOption.getAttribute('data-translate')];
+                const year = yearSelect.value;
+                
+                calendarTitle.textContent = `${monthName} ${year}`;
+            }
+        }
+        
+        function initializeCalendar() {
+            // Get student ID from localStorage
+            const studentId = localStorage.getItem('currentStudentId');
+            if (!studentId) {
+                alert('Siz tizimga kirmagansiz!');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Set default month and year to current date
+            const now = new Date();
+            const monthFilter = document.getElementById('monthFilter');
+            const yearFilter = document.getElementById('yearFilter');
+            
+            monthFilter.value = now.getMonth();
+            
+            // Find year option that matches current year, or default to first
+            let yearFound = false;
+            for (let i = 0; i < yearFilter.options.length; i++) {
+                if (yearFilter.options[i].value == now.getFullYear()) {
+                    yearFilter.selectedIndex = i;
+                    yearFound = true;
+                    break;
+                }
+            }
+            
+            // Add current year if not found
+            if (!yearFound) {
+                const option = document.createElement('option');
+                option.value = now.getFullYear();
+                option.textContent = now.getFullYear();
+                yearFilter.appendChild(option);
+                yearFilter.value = now.getFullYear();
+            }
+            
+            // Update calendar title
+            updateCalendarTitle();
+            
+            // Load attendance data
+            const attendance = getFromStorage('attendance') || [];
+            const studentAttendance = attendance.filter(a => a.studentId == studentId);
+            
+            // Count status types
+            const presentDays = studentAttendance.filter(a => a.status === 'present').length;
+            const absentDays = studentAttendance.filter(a => a.status === 'absent').length;
+            const lateDays = studentAttendance.filter(a => a.status === 'late').length;
+            
+            // Update stats
+            document.getElementById('presentDays').textContent = presentDays;
+            document.getElementById('absentDays').textContent = absentDays;
+            document.getElementById('lateDays').textContent = lateDays;
+            
+            // Calculate attendance percentage
+            const totalDays = studentAttendance.length;
+            const percentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+            document.getElementById('attendancePercentage').textContent = percentage + '%';
+            
+            // Render calendar for current month/year
+            renderCalendar(parseInt(monthFilter.value), parseInt(yearFilter.value), studentAttendance);
+            
+            // Add event listeners for filters
+            monthFilter.addEventListener('change', function() {
+                updateCalendarTitle();
+                renderCalendar(parseInt(this.value), parseInt(yearFilter.value), studentAttendance);
+            });
+            
+            yearFilter.addEventListener('change', function() {
+                updateCalendarTitle();
+                renderCalendar(parseInt(monthFilter.value), parseInt(this.value), studentAttendance);
+            });
+            
+            document.getElementById('prevMonth').addEventListener('click', function() {
+                let month = parseInt(monthFilter.value);
+                let year = parseInt(yearFilter.value);
+                
+                month--;
+                if (month < 0) {
+                    month = 11;
+                    year--;
+                }
+                
+                monthFilter.value = month;
+                
+                // Check if year exists in options, add if not
+                let yearExists = false;
+                for (let i = 0; i < yearFilter.options.length; i++) {
+                    if (yearFilter.options[i].value == year) {
+                        yearFilter.value = year;
+                        yearExists = true;
+                        break;
+                    }
+                }
+                
+                if (!yearExists) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearFilter.appendChild(option);
+                    yearFilter.value = year;
+                }
+                
+                updateCalendarTitle();
+                renderCalendar(month, year, studentAttendance);
+            });
+            
+            document.getElementById('nextMonth').addEventListener('click', function() {
+                let month = parseInt(monthFilter.value);
+                let year = parseInt(yearFilter.value);
+                
+                month++;
+                if (month > 11) {
+                    month = 0;
+                    year++;
+                }
+                
+                monthFilter.value = month;
+                
+                // Check if year exists in options, add if not
+                let yearExists = false;
+                for (let i = 0; i < yearFilter.options.length; i++) {
+                    if (yearFilter.options[i].value == year) {
+                        yearFilter.value = year;
+                        yearExists = true;
+                        break;
+                    }
+                }
+                
+                if (!yearExists) {
+                    const option = document.createElement('option');
+                    option.value = year;
+                    option.textContent = year;
+                    yearFilter.appendChild(option);
+                    yearFilter.value = year;
+                }
+                
+                updateCalendarTitle();
+                renderCalendar(month, year, studentAttendance);
+            });
+            
+            // Apply filter by status
+            document.getElementById('statusFilter').addEventListener('change', function() {
+                renderCalendar(parseInt(monthFilter.value), parseInt(yearFilter.value), studentAttendance);
+            });
+        }
+        
+        function renderCalendar(month, year, attendanceData) {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const statusFilter = document.getElementById('statusFilter').value;
+            
+            // Clear previous calendar
+            calendarGrid.innerHTML = '';
+            
+            // Add day headers
+            const dayLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            for (let i = 0; i < 7; i++) {
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'calendar-day-header';
+                dayHeader.textContent = dayLabels[i];
+                calendarGrid.appendChild(dayHeader);
+            }
+            
+            // Get first day of month and last day
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            
+            // Get day of week of first day (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
+            let firstDayOfWeek = firstDay.getDay();
+            // Convert Sunday (0) to 6 for our calendar layout where Monday is first day
+            firstDayOfWeek = firstDayOfWeek === 0 ? 6 : firstDayOfWeek - 1;
+            
+            // Add empty cells before first day
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day empty';
+                calendarGrid.appendChild(emptyCell);
+            }
+            
+            // Add cells for each day of the month
+            const today = new Date();
+            
+            for (let day = 1; day <= lastDay.getDate(); day++) {
+                const date = new Date(year, month, day);
+                const dateString = date.toISOString().split('T')[0]; // YYYY-MM-DD format
+                
+                // Find attendance for this day
+                const dayAttendance = attendanceData.find(a => a.date === dateString);
+                
+                // If status filter is active and this day doesn't match, skip to next day
+                if (statusFilter !== 'all' && (!dayAttendance || dayAttendance.status !== statusFilter)) {
+                    // Create empty cell but mark it as a real day
+                    const emptyCell = document.createElement('div');
+                    emptyCell.className = 'calendar-day';
+                    emptyCell.innerHTML = `<div class="date">${day}</div>`;
+                    calendarGrid.appendChild(emptyCell);
+                    continue;
+                }
+                
+                // Create cell for this day
+                const dayCell = document.createElement('div');
+                
+                // Basic class
+                dayCell.className = 'calendar-day';
+                
+                // Add today class if it's today
+                if (today.getFullYear() === year && today.getMonth() === month && today.getDate() === day) {
+                    dayCell.classList.add('today');
+                }
+                
+                // Add status class and status text if there's attendance for this day
+                if (dayAttendance) {
+                    dayCell.classList.add(dayAttendance.status);
+                    
+                    // Get translated status label
+                    let statusLabel = '';
+                    if (dayAttendance.status === 'present') {
+                        statusLabel = attendanceTranslations[currentLang].present;
+                    } else if (dayAttendance.status === 'absent') {
+                        statusLabel = attendanceTranslations[currentLang].absent;
+                    } else if (dayAttendance.status === 'late') {
+                        statusLabel = attendanceTranslations[currentLang].late;
+                    }
+                    
+                    dayCell.innerHTML = `
+                        <div class="date">${day}</div>
+                        <div class="status">${statusLabel}</div>
+                    `;
+                } else {
+                    dayCell.innerHTML = `<div class="date">${day}</div>`;
+                }
+                
+                calendarGrid.appendChild(dayCell);
+            }
+        }
+    </script>
+</body>
+</html> 

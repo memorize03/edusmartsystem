@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fanlar | Admin Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../admin-language.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar qismi -->
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="adminTab">Administrator</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="students.html"><i class="material-icons">people</i> <span data-translate="students">O'quvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="teachers.html"><i class="material-icons">school</i> <span data-translate="teachers">O'qituvchilar</span></a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="subjects.html"><i class="material-icons">menu_book</i> <span data-translate="subjects">Fanlar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="reports.html"><i class="material-icons">analytics</i> <span data-translate="reports">Hisobotlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <!-- Asosiy kontent -->
+        <div class="main-content">
+            <h1 data-translate="subjectList">Fanlar ro'yxati</h1>
+            <div class="action-buttons">
+                <button class="add-btn" onclick="document.getElementById('addSubjectModal').style.display='block'">
+                    <i class="material-icons">add</i> <span data-translate="addSubject">Fan qo'shish</span>
+                </button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Qidiruv..." oninput="filterSubjects()">
+                    <i class="material-icons" onclick="filterSubjects()">search</i>
+                </div>
+            </div>
+            <div class="data-table">
+                <table id="subjectsTable">
+                    <thead>
+                        <tr>
+                            <th data-translate="subjectId">ID</th>
+                            <th data-translate="subjectName">Fan nomi</th>
+                            <th data-translate="hours">Soatlar</th>
+                            <th data-translate="actions">Amallar</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectsList">
+                        <!-- Fanlar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Subject Modal -->
+            <div id="addSubjectModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="addNewSubject">Yangi fan qo'shish</h2>
+                        <span class="close" onclick="document.getElementById('addSubjectModal').style.display='none'; document.getElementById('addSubjectForm').reset();">&times;</span>
+                    </div>
+                    <form id="addSubjectForm">
+                        <div class="form-group">
+                            <label for="subjectName" data-translate="subjectName">Fan nomi</label>
+                            <input type="text" id="subjectName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="subjectHours" data-translate="hours">Soatlar</label>
+                            <input type="number" id="subjectHours" name="hours" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('addSubjectModal').style.display='none'; document.getElementById('addSubjectForm').reset();" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Subject Modal -->
+            <div id="editSubjectModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="editSubject">Fan ma'lumotlarini tahrirlash</h2>
+                        <span class="close" onclick="document.getElementById('editSubjectModal').style.display='none'">&times;</span>
+                    </div>
+                    <form id="editSubjectForm">
+                        <input type="hidden" id="editSubjectId" name="id">
+                        <div class="form-group">
+                            <label for="editSubjectName" data-translate="subjectName">Fan nomi</label>
+                            <input type="text" id="editSubjectName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editSubjectHours" data-translate="hours">Soatlar</label>
+                            <input type="number" id="editSubjectHours" name="hours" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('editSubjectModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteSubjectModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="confirmDeletion">O'chirishni tasdiqlang</h2>
+                        <span class="close" onclick="document.getElementById('deleteSubjectModal').style.display='none'">&times;</span>
+                    </div>
+                    <p data-translate="deleteSubjectConfirm">Ushbu fanni o'chirishni xohlaysizmi?</p>
+                    <div class="modal-buttons">
+                        <button type="button" class="cancel-btn" onclick="document.getElementById('deleteSubjectModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                        <button type="button" class="delete-btn" id="confirmDeleteSubject" data-translate="delete">O'chirish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fanlar ro'yxatini data.js dan olish
+            let subjects = getFromStorage('subjects') || [];
+            
+            // Fanlar ro'yxatini ko'rsatish
+            renderSubjects();
+            
+            // Modal oynani tashqi click bilan yopish
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('addSubjectModal')) {
+                    document.getElementById('addSubjectModal').style.display = 'none';
+                    document.getElementById('addSubjectForm').reset();
+                }
+                if (event.target === document.getElementById('editSubjectModal')) {
+                    document.getElementById('editSubjectModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('deleteSubjectModal')) {
+                    document.getElementById('deleteSubjectModal').style.display = 'none';
+                }
+            });
+            
+            // Formani yuborish
+            document.getElementById('addSubjectForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const nameInput = document.getElementById('subjectName');
+                const hoursInput = document.getElementById('subjectHours');
+                
+                if (!nameInput.value.trim() || !hoursInput.value.trim()) {
+                    alert('Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                // Yangi ID olish
+                const nextId = subjects.length > 0 ? Math.max(...subjects.map(s => s.id)) + 1 : 1;
+                
+                const newSubject = {
+                    id: nextId,
+                    name: nameInput.value.trim(),
+                    hours: parseInt(hoursInput.value.trim())
+                };
+                
+                subjects.push(newSubject);
+                saveToStorage('subjects', subjects);
+                renderSubjects();
+                
+                // Modalni yopish
+                document.getElementById('addSubjectModal').style.display = 'none';
+                this.reset();
+            });
+
+            // Tahrirlash formasi uchun
+            document.getElementById('editSubjectForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const subjectId = parseInt(document.getElementById('editSubjectId').value || localStorage.getItem('editingSubjectId'));
+                const nameInput = document.getElementById('editSubjectName');
+                const hoursInput = document.getElementById('editSubjectHours');
+                
+                if (!nameInput.value.trim() || !hoursInput.value.trim()) {
+                    alert('Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                const updatedSubject = {
+                    name: nameInput.value.trim(),
+                    hours: parseInt(hoursInput.value.trim())
+                };
+                
+                // Fanni yangilash
+                updateSubject(subjectId, updatedSubject);
+                
+                // Ro'yxatni yangilash
+                subjects = getFromStorage('subjects');
+                renderSubjects();
+                
+                // Modalni yopish
+                document.getElementById('editSubjectModal').style.display = 'none';
+                this.reset();
+            });
+
+            // O'chirish tugmasi uchun
+            document.getElementById('confirmDeleteSubject').addEventListener('click', function() {
+                const subjectId = parseInt(localStorage.getItem('deletingSubjectId'));
+                if (subjectId) {
+                    deleteSubject(subjectId);
+                    document.getElementById('deleteSubjectModal').style.display = 'none';
+                    localStorage.removeItem('deletingSubjectId');
+                }
+            });
+        });
+        
+        // Fanlar ro'yxatini ko'rsatish
+        function renderSubjects() {
+            const subjects = getFromStorage('subjects') || [];
+            const tbody = document.getElementById('subjectsList');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            subjects.forEach(subject => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td>${subject.id}</td>
+                    <td>${subject.name}</td>
+                    <td>${subject.hours}</td>
+                    <td class="actions">
+                        <button class="icon-btn edit" onclick="editSubject(${subject.id})">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="icon-btn delete" onclick="showDeleteSubject(${subject.id})">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Fanni tahrirlash
+        function editSubject(id) {
+            const subjects = getFromStorage('subjects') || [];
+            const subject = subjects.find(s => s.id === id);
+            
+            if (subject) {
+                document.getElementById('editSubjectId').value = subject.id;
+                document.getElementById('editSubjectName').value = subject.name;
+                document.getElementById('editSubjectHours').value = subject.hours;
+                
+                // Fan ID'sini localStorage'ga saqlash
+                localStorage.setItem('editingSubjectId', id);
+                
+                // Modalni ochish
+                document.getElementById('editSubjectModal').style.display = 'block';
+            }
+        }
+
+        // O'chirish modalni ko'rsatish
+        function showDeleteSubject(id) {
+            localStorage.setItem('deletingSubjectId', id);
+            document.getElementById('deleteSubjectModal').style.display = 'block';
+        }
+
+        // Fanni o'chirish
+        function deleteSubject(id) {
+            let subjects = getFromStorage('subjects') || [];
+            subjects = subjects.filter(s => s.id !== id);
+            saveToStorage('subjects', subjects);
+            renderSubjects();
+        }
+
+        // Qidirish funksiyasi
+        function filterSubjects() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.getElementById('subjectsList').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const name = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+                
+                if (name.indexOf(filter) > -1) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Placeholder attribute translation
+        document.getElementById('searchInput').setAttribute('placeholder', getTranslation('search') || 'Qidiruv...');
+    </script>
+</body>
+</html> 

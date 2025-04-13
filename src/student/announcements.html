@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E'lonlar | O'quvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../student-language.js"></script>
+    <style>
+        .main-content {
+            background-image: url('../images/student-announcements-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding-bottom: 30px;
+            position: relative;
+        }
+        
+        /* Language selector styles */
+        .language-selector-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .language-selector {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-selector label {
+            margin-right: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .language-selector select {
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        
+        .filter-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .filter-group select, .filter-group input {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            background-color: white;
+            transition: border-color 0.3s;
+        }
+        
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        
+        .announcements-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .announcement-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .announcement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        
+        .announcement-header {
+            padding: 15px 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .announcement-header h3 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .announcement-header .date {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+        
+        .announcement-content {
+            padding: 20px;
+            color: #34495e;
+            line-height: 1.6;
+        }
+        
+        .announcement-footer {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-top: 1px solid #eee;
+            font-size: 0.9rem;
+            color: #7f8c8d;
+        }
+        
+        .high-priority {
+            border-left: 5px solid #e74c3c;
+        }
+        
+        .medium-priority {
+            border-left: 5px solid #f39c12;
+        }
+        
+        .no-data {
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            color: #7f8c8d;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .filter-section {
+                flex-direction: column;
+            }
+        }
+        
+        /* Animatsiya */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .announcements-container {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .announcement-card {
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-fill-mode: both;
+        }
+        
+        .announcement-card:nth-child(1) { animation-delay: 0.1s; }
+        .announcement-card:nth-child(2) { animation-delay: 0.2s; }
+        .announcement-card:nth-child(3) { animation-delay: 0.3s; }
+        .announcement-card:nth-child(4) { animation-delay: 0.4s; }
+        .announcement-card:nth-child(5) { animation-delay: 0.5s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="studentTab">O'quvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="material-icons">dashboard</i>
+                            <span data-translate="home">Bosh sahifa</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="grades.html">
+                            <i class="material-icons">grade</i>
+                            <span data-translate="grades">Baholar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html">
+                            <i class="material-icons">event_note</i>
+                            <span data-translate="attendance">Davomat</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="announcements.html">
+                            <i class="material-icons">campaign</i>
+                            <span data-translate="announcements">E'lonlar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html">
+                            <i class="material-icons">logout</i>
+                            <span data-translate="logout">Chiqish</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="announcements">E'lonlar</h1>
+            
+            <!-- Language selector visible at top-right -->
+            <div class="language-selector-wrapper">
+                <div class="language-selector">
+                    <label data-translate="languageLabel">Til:</label>
+                    <select id="language-select" onchange="changeLanguage(this.value)">
+                        <option value="uz">O'zbekcha</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="typeFilter" data-translate="announcementType">E'lon turi</label>
+                    <select id="typeFilter">
+                        <option value="all" data-translate="allTypes">Barcha turlar</option>
+                        <option value="students" data-translate="forStudents">O'quvchilar uchun</option>
+                        <option value="all" data-translate="generalAnnouncements">Umumiy e'lonlar</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="dateFilter" data-translate="dateFilter">Sana bo'yicha</label>
+                    <select id="dateFilter">
+                        <option value="all" data-translate="allDates">Barcha sanalar</option>
+                        <option value="today" data-translate="today">Bugun</option>
+                        <option value="week" data-translate="thisWeek">Shu hafta</option>
+                        <option value="month" data-translate="thisMonth">Shu oy</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="searchFilter" data-translate="search">Qidiruv</label>
+                    <input type="text" id="searchFilter" data-translate-placeholder="searchAnnouncements" placeholder="E'lonlar bo'yicha qidiruv...">
+                </div>
+            </div>
+            
+            <div class="announcements-container" id="announcementsContainer">
+                <!-- E'lonlar shu yerda JavaScript orqali ko'rsatiladi -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Define translations for announcement-specific elements
+        const announcementsTranslations = {
+            uz: {
+                announcementType: "E'lon turi",
+                allTypes: "Barcha turlar",
+                forStudents: "O'quvchilar uchun",
+                generalAnnouncements: "Umumiy e'lonlar",
+                dateFilter: "Sana bo'yicha",
+                allDates: "Barcha sanalar",
+                today: "Bugun",
+                thisWeek: "Shu hafta",
+                thisMonth: "Shu oy",
+                search: "Qidiruv",
+                searchAnnouncements: "E'lonlar bo'yicha qidiruv...",
+                noAnnouncements: "E'lonlar mavjud emas",
+                from: "dan",
+                priority: "Muhimlik darajasi"
+            },
+            ru: {
+                announcementType: "Тип объявления",
+                allTypes: "Все типы",
+                forStudents: "Для учеников",
+                generalAnnouncements: "Общие объявления",
+                dateFilter: "По дате",
+                allDates: "Все даты",
+                today: "Сегодня",
+                thisWeek: "Эта неделя",
+                thisMonth: "Этот месяц",
+                search: "Поиск",
+                searchAnnouncements: "Поиск по объявлениям...",
+                noAnnouncements: "Объявления отсутствуют",
+                from: "от",
+                priority: "Приоритет"
+            },
+            en: {
+                announcementType: "Announcement Type",
+                allTypes: "All Types",
+                forStudents: "For Students",
+                generalAnnouncements: "General Announcements",
+                dateFilter: "By Date",
+                allDates: "All Dates",
+                today: "Today",
+                thisWeek: "This Week",
+                thisMonth: "This Month",
+                search: "Search",
+                searchAnnouncements: "Search announcements...",
+                noAnnouncements: "No announcements available",
+                from: "from",
+                priority: "Priority"
+            }
+        };
+        
+        // Make sure these translations are added to the global translations
+        for (let lang in announcementsTranslations) {
+            for (let key in announcementsTranslations[lang]) {
+                if (!allTranslations[lang][key]) {
+                    allTranslations[lang][key] = announcementsTranslations[lang][key];
+                }
+            }
+        }
+        
+        // Set up the language selection based on stored preference
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current language from localStorage or default to Uzbek
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            console.log(`DOMContentLoaded: Setting language to ${currentLang}`);
+            
+            // Set the language dropdown to the current language
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLang;
+                console.log(`Set language dropdown to ${currentLang}`);
+            }
+            
+            // Apply translations
+            if (typeof applyTranslations === 'function') {
+                console.log('Applying global translations');
+                applyTranslations();
+            } else {
+                console.warn('applyTranslations function not found!');
+            }
+            
+            // Force translate elements that might not be covered by the global translation
+            console.log('Applying announcements-specific translations');
+            applyAnnouncementsTranslations();
+            
+            // Load and display announcements
+            console.log('Loading announcements');
+            loadAnnouncements();
+            
+            // Set up filter event listeners
+            document.getElementById('typeFilter').addEventListener('change', filterAnnouncements);
+            document.getElementById('dateFilter').addEventListener('change', filterAnnouncements);
+            document.getElementById('searchFilter').addEventListener('input', filterAnnouncements);
+        });
+        
+        // Function to change language
+        function changeLanguage(lang) {
+            // Store the selected language
+            localStorage.setItem('selectedLanguage', lang);
+            
+            // Apply translations
+            if (typeof applyTranslations === 'function') {
+                applyTranslations();
+            }
+            
+            // Apply announcements-specific translations
+            applyAnnouncementsTranslations();
+            
+            // Reload announcements to show translated content
+            loadAnnouncements();
+            
+            // Force re-render all visible announcements with new language
+            const announcementsContainer = document.getElementById('announcementsContainer');
+            if (announcementsContainer) {
+                console.log(`Refreshing announcements for language: ${lang}`);
+                
+                // Get current filter values
+                const typeFilter = document.getElementById('typeFilter')?.value;
+                const dateFilter = document.getElementById('dateFilter')?.value;
+                const searchFilter = document.getElementById('searchFilter')?.value;
+                
+                // Apply filters to get currently visible announcements
+                filterAnnouncements();
+            }
+        }
+        
+        // Function to apply announcements-specific translations
+        function applyAnnouncementsTranslations() {
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Apply translations to elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                
+                // Only apply if we have a translation for this key
+                if (announcementsTranslations[currentLang] && announcementsTranslations[currentLang][key]) {
+                    element.textContent = announcementsTranslations[currentLang][key];
+                }
+            });
+            
+            // Update placeholders based on language
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (announcementsTranslations[currentLang] && announcementsTranslations[currentLang][key]) {
+                    element.placeholder = announcementsTranslations[currentLang][key];
+                }
+            });
+        }
+        
+        // Function to load announcements
+        function loadAnnouncements() {
+            // Check if the student is logged in
+            const studentId = localStorage.getItem('currentStudentId');
+            if (!studentId) {
+                alert('Siz tizimga kirmagansiz!');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Get announcements from localStorage
+            const announcements = getFromStorage('announcements') || [];
+            
+            // Filter for student-relevant announcements (student-specific or for all)
+            const relevantAnnouncements = announcements.filter(a => a.target === 'students' || a.target === 'all');
+            
+            // Sort by date (newest first)
+            relevantAnnouncements.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Render announcements
+            renderAnnouncements(relevantAnnouncements);
+        }
+        
+        // Function to render announcements
+        function renderAnnouncements(announcements) {
+            const container = document.getElementById('announcementsContainer');
+            container.innerHTML = '';
+            
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            const noAnnouncementsText = announcementsTranslations[currentLang].noAnnouncements || "E'lonlar mavjud emas";
+            const fromText = announcementsTranslations[currentLang].from || "dan";
+            
+            // Translation for "Admin" in different languages
+            const adminTranslation = {
+                uz: "Admin",
+                ru: "Администратор",
+                en: "Administrator"
+            };
+            
+            // Translation for "O'qituvchi" in different languages
+            const teacherTranslation = {
+                uz: "O'qituvchi",
+                ru: "Учитель",
+                en: "Teacher"
+            };
+            
+            if (announcements.length === 0) {
+                container.innerHTML = `<div class="no-data">${noAnnouncementsText}</div>`;
+                return;
+            }
+            
+            announcements.forEach(announcement => {
+                const date = new Date(announcement.date);
+                const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+                
+                // Determine priority class (for visual styling)
+                let priorityClass = '';
+                if (announcement.priority === 'high') {
+                    priorityClass = 'high-priority';
+                } else if (announcement.priority === 'medium') {
+                    priorityClass = 'medium-priority';
+                }
+                
+                // Get translated content for the current language
+                let title = announcement.title;
+                let content = announcement.content;
+                
+                // Use translations if available
+                if (announcement.translations && announcement.translations[currentLang]) {
+                    title = announcement.translations[currentLang].title || title;
+                    content = announcement.translations[currentLang].content || content;
+                    console.log(`Using translated title: ${title} for language: ${currentLang}`);
+                } else {
+                    console.log(`No translation found for announcement ${announcement.id} in ${currentLang}`);
+                }
+                
+                // Get author name and translate if it's Admin or Teacher
+                let author = announcement.author || 'Admin';
+                if (author === 'Admin') {
+                    author = adminTranslation[currentLang] || author;
+                } else if (author === "O'qituvchi") {
+                    author = teacherTranslation[currentLang] || author;
+                }
+                
+                const card = document.createElement('div');
+                card.className = `announcement-card ${priorityClass}`;
+                
+                card.innerHTML = `
+                    <div class="announcement-header">
+                        <h3>${title}</h3>
+                        <div class="date">${formattedDate}</div>
+                    </div>
+                    <div class="announcement-content">
+                        ${content}
+                    </div>
+                    <div class="announcement-footer">
+                        ${fromText} ${author}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        // Function to filter announcements
+        function filterAnnouncements() {
+            // Get filter values
+            const typeFilter = document.getElementById('typeFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            const searchFilter = document.getElementById('searchFilter').value.toLowerCase();
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Get all announcements
+            const announcements = getFromStorage('announcements') || [];
+            
+            // Start with student-relevant announcements
+            let filteredAnnouncements = announcements.filter(a => a.target === 'students' || a.target === 'all');
+            
+            // Apply type filter
+            if (typeFilter !== 'all') {
+                filteredAnnouncements = filteredAnnouncements.filter(a => a.target === typeFilter);
+            }
+            
+            // Apply date filter
+            if (dateFilter !== 'all') {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const thisWeek = new Date(today);
+                thisWeek.setDate(today.getDate() - today.getDay()); // Start of week (Sunday)
+                
+                const thisMonth = new Date(today);
+                thisMonth.setDate(1); // Start of month
+                
+                filteredAnnouncements = filteredAnnouncements.filter(a => {
+                    const announcementDate = new Date(a.date);
+                    announcementDate.setHours(0, 0, 0, 0);
+                    
+                    if (dateFilter === 'today') {
+                        return announcementDate.getTime() === today.getTime();
+                    } else if (dateFilter === 'week') {
+                        return announcementDate >= thisWeek;
+                    } else if (dateFilter === 'month') {
+                        return announcementDate >= thisMonth;
+                    }
+                    return true;
+                });
+            }
+            
+            // Apply search filter
+            if (searchFilter) {
+                filteredAnnouncements = filteredAnnouncements.filter(a => {
+                    // Get the translated title and content for current language
+                    let title = a.title;
+                    let content = a.content;
+                    
+                    // Use translations if available
+                    if (a.translations && a.translations[currentLang]) {
+                        title = a.translations[currentLang].title || title;
+                        content = a.translations[currentLang].content || content;
+                    }
+                    
+                    // Search in the translated content
+                    return title.toLowerCase().includes(searchFilter) || 
+                           content.toLowerCase().includes(searchFilter) ||
+                           (a.author && a.author.toLowerCase().includes(searchFilter));
+                });
+            }
+            
+            // Sort by date (newest first)
+            filteredAnnouncements.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Render filtered announcements
+            renderAnnouncements(filteredAnnouncements);
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E'lonlar | Admin Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../admin-language.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="adminTab">Administrator</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="students.html"><i class="material-icons">people</i> <span data-translate="students">O'quvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="teachers.html"><i class="material-icons">school</i> <span data-translate="teachers">O'qituvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="subjects.html"><i class="material-icons">menu_book</i> <span data-translate="subjects">Fanlar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="reports.html"><i class="material-icons">analytics</i> <span data-translate="reports">Hisobotlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="announcements">E'lonlar</h1>
+            <div class="action-buttons">
+                <button class="add-btn" onclick="document.getElementById('addAnnouncementModal').style.display='block'">
+                    <i class="material-icons">add</i> <span data-translate="addAnnouncement">Yangi e'lon</span>
+                </button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Qidiruv..." oninput="filterAnnouncements()">
+                    <i class="material-icons" onclick="filterAnnouncements()">search</i>
+                </div>
+            </div>
+            <div class="data-table">
+                <table id="announcementsTable">
+                    <thead>
+                        <tr>
+                            <th data-translate="id">ID</th>
+                            <th data-translate="title">SARLAVHA</th>
+                            <th data-translate="content">MATN</th>
+                            <th data-translate="date">SANA</th>
+                            <th data-translate="actions">AMALLAR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="announcementsList">
+                        <!-- E'lonlar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Announcement Modal -->
+            <div id="addAnnouncementModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="addNewAnnouncement">Yangi e'lon qo'shish</h2>
+                        <div id="addLanguageIndicator" style="font-size: 14px; color: #666; margin-top: 5px;"></div>
+                        <span class="close" onclick="document.getElementById('addAnnouncementModal').style.display='none'; document.getElementById('addAnnouncementForm').reset();">&times;</span>
+                    </div>
+                    <form id="addAnnouncementForm">
+                        <div class="form-group">
+                            <label for="announcementTitle" data-translate="title">Sarlavha</label>
+                            <input type="text" id="announcementTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementContent" data-translate="content">Matn</label>
+                            <textarea id="announcementContent" name="content" required rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementTarget" data-translate="targetAudience">Maqsadli auditoriya</label>
+                            <select id="announcementTarget" name="target">
+                                <option value="all" data-translate="all">Barcha</option>
+                                <option value="students" data-translate="students">O'quvchilar</option>
+                                <option value="teachers" data-translate="teachers">O'qituvchilar</option>
+                                <option value="parents" data-translate="parents">Ota-onalar</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="announcementId" value="">
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('addAnnouncementModal').style.display='none'; document.getElementById('addAnnouncementForm').reset();" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Announcement Modal -->
+            <div id="editAnnouncementModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="editAnnouncement">E'lon ma'lumotlarini tahrirlash</h2>
+                        <div id="editLanguageIndicator" style="font-size: 14px; color: #666; margin-top: 5px;"></div>
+                        <span class="close" onclick="document.getElementById('editAnnouncementModal').style.display='none'">&times;</span>
+                    </div>
+                    <form id="editAnnouncementForm">
+                        <input type="hidden" id="editAnnouncementId" name="id">
+                        <div class="form-group">
+                            <label for="editAnnouncementTitle" data-translate="title">Sarlavha</label>
+                            <input type="text" id="editAnnouncementTitle" name="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAnnouncementContent" data-translate="content">Matn</label>
+                            <textarea id="editAnnouncementContent" name="content" required rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="editAnnouncementTarget" data-translate="targetAudience">Maqsadli auditoriya</label>
+                            <select id="editAnnouncementTarget" name="target">
+                                <option value="all" data-translate="all">Barcha</option>
+                                <option value="students" data-translate="students">O'quvchilar</option>
+                                <option value="teachers" data-translate="teachers">O'qituvchilar</option>
+                                <option value="parents" data-translate="parents">Ota-onalar</option>
+                            </select>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('editAnnouncementModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteAnnouncementModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="confirmDeletion">O'chirishni tasdiqlang</h2>
+                        <span class="close" onclick="document.getElementById('deleteAnnouncementModal').style.display='none'">&times;</span>
+                    </div>
+                    <p data-translate="deleteAnnouncementConfirm">Ushbu e'lonni o'chirishni xohlaysizmi?</p>
+                    <div class="modal-buttons">
+                        <button type="button" class="cancel-btn" onclick="document.getElementById('deleteAnnouncementModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                        <button type="button" class="delete-btn" id="confirmDeleteAnnouncement" data-translate="delete">O'chirish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // E'lonlar ro'yxatini yuklash
+            renderAnnouncements();
+            
+            // Update language indicators
+            updateLanguageIndicators();
+            
+            // Modal oynani tashqi click bilan yopish
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('addAnnouncementModal')) {
+                    document.getElementById('addAnnouncementModal').style.display = 'none';
+                    document.getElementById('addAnnouncementForm').reset();
+                }
+                if (event.target === document.getElementById('editAnnouncementModal')) {
+                    document.getElementById('editAnnouncementModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('deleteAnnouncementModal')) {
+                    document.getElementById('deleteAnnouncementModal').style.display = 'none';
+                }
+            });
+            
+            // Formani yuborish
+            document.getElementById('addAnnouncementForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const titleInput = document.getElementById('announcementTitle');
+                const contentInput = document.getElementById('announcementContent');
+                const targetInput = document.getElementById('announcementTarget');
+                
+                if (!titleInput.value.trim() || !contentInput.value.trim()) {
+                    alert(getTranslation('fillAllFields') || 'Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                const announcements = getFromStorage('announcements') || [];
+                
+                // Yangi ID olish
+                const nextId = announcements.length > 0 ? Math.max(...announcements.map(a => a.id)) + 1 : 1;
+                
+                // Get current language
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                // Initialize translations object
+                const translations = {};
+                
+                // If the current language is not UZ, add the UZ translation as primary and current as translation
+                if (currentLang !== 'uz') {
+                    translations['uz'] = {
+                        title: titleInput.value.trim(),
+                        content: contentInput.value.trim()
+                    };
+                }
+                
+                const newAnnouncement = {
+                    id: nextId,
+                    title: titleInput.value.trim(),
+                    content: contentInput.value.trim(),
+                    target: targetInput.value,
+                    date: new Date().toISOString().split('T')[0],
+                    translations: translations
+                };
+                
+                announcements.push(newAnnouncement);
+                saveToStorage('announcements', announcements);
+                renderAnnouncements();
+                
+                // Modalni yopish
+                document.getElementById('addAnnouncementModal').style.display = 'none';
+                this.reset();
+            });
+            
+            // Tahrirlash formasi uchun
+            document.getElementById('editAnnouncementForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const announcements = getFromStorage('announcements') || [];
+                const announcementId = parseInt(document.getElementById('editAnnouncementId').value);
+                const titleInput = document.getElementById('editAnnouncementTitle');
+                const contentInput = document.getElementById('editAnnouncementContent');
+                const targetInput = document.getElementById('editAnnouncementTarget');
+                
+                if (!titleInput.value.trim() || !contentInput.value.trim()) {
+                    alert(getTranslation('fillAllFields') || 'Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                // Get current language
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                // Find the existing announcement
+                const existingIndex = announcements.findIndex(a => a.id === announcementId);
+                if (existingIndex === -1) return;
+                
+                const existingAnnouncement = announcements[existingIndex];
+                
+                // Initialize or get existing translations
+                let translations = existingAnnouncement.translations || {};
+                
+                // If current language is not UZ, update the translation
+                if (currentLang !== 'uz') {
+                    translations[currentLang] = {
+                        title: titleInput.value.trim(),
+                        content: contentInput.value.trim()
+                    };
+                } else {
+                    // If editing in UZ, update any existing translations to match format
+                    if (translations) {
+                        Object.keys(translations).forEach(lang => {
+                            // Keep existing translations for other languages
+                        });
+                    }
+                }
+                
+                const updatedAnnouncement = {
+                    id: announcementId,
+                    title: titleInput.value.trim(),
+                    content: contentInput.value.trim(),
+                    target: targetInput.value,
+                    date: new Date().toISOString().split('T')[0],
+                    translations: translations
+                };
+                
+                // E'lonni yangilash
+                if (existingIndex !== -1) {
+                    announcements[existingIndex] = updatedAnnouncement;
+                    saveToStorage('announcements', announcements);
+                    renderAnnouncements();
+                }
+                
+                // Modalni yopish
+                document.getElementById('editAnnouncementModal').style.display = 'none';
+                this.reset();
+            });
+            
+            // O'chirish tugmasi uchun
+            document.getElementById('confirmDeleteAnnouncement').addEventListener('click', function() {
+                const announcementId = parseInt(localStorage.getItem('deletingAnnouncementId'));
+                if (announcementId) {
+                    deleteAnnouncement(announcementId);
+                    document.getElementById('deleteAnnouncementModal').style.display = 'none';
+                    localStorage.removeItem('deletingAnnouncementId');
+                }
+            });
+            
+            // Placeholder attribute translation
+            document.getElementById('searchInput').setAttribute('placeholder', getTranslation('search') || 'Qidiruv...');
+        });
+
+        // E'lonlar ro'yxatini ko'rsatish
+        function renderAnnouncements() {
+            const tbody = document.getElementById('announcementsList');
+            if (!tbody) return;
+            
+            const announcements = getFromStorage('announcements') || [];
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            tbody.innerHTML = '';
+            
+            announcements.forEach(announcement => {
+                const row = document.createElement('tr');
+                
+                // Get translated title and content if available
+                let title = announcement.title;
+                let content = announcement.content;
+                
+                // Check if announcement has translations
+                if (announcement.translations && announcement.translations[currentLang]) {
+                    if (announcement.translations[currentLang].title) {
+                        title = announcement.translations[currentLang].title;
+                    }
+                    if (announcement.translations[currentLang].content) {
+                        content = announcement.translations[currentLang].content;
+                    }
+                }
+                
+                // Matnni qisqartirish
+                let shortContent = content;
+                if (shortContent && shortContent.length > 50) {
+                    shortContent = shortContent.substring(0, 47) + '...';
+                }
+                
+                // Sana formati
+                let dateStr = announcement.date || new Date().toISOString().split('T')[0];
+                
+                row.innerHTML = `
+                    <td>${announcement.id}</td>
+                    <td>${title}</td>
+                    <td>${shortContent}</td>
+                    <td>${dateStr}</td>
+                    <td class="actions">
+                        <button class="icon-btn edit" onclick="editAnnouncement(${announcement.id})">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="icon-btn delete" onclick="showDeleteAnnouncement(${announcement.id})">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Make renderAnnouncements function available globally
+        window.renderAnnouncements = renderAnnouncements;
+
+        // E'lonni tahrirlash
+        function editAnnouncement(id) {
+            const announcements = getFromStorage('announcements') || [];
+            const announcement = announcements.find(a => a.id === id);
+            
+            if (announcement) {
+                // Get current language
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                document.getElementById('editAnnouncementId').value = announcement.id;
+                
+                // Use translated content if available for the current language
+                let title = announcement.title;
+                let content = announcement.content;
+                
+                if (currentLang !== 'uz' && announcement.translations && 
+                    announcement.translations[currentLang]) {
+                        
+                    if (announcement.translations[currentLang].title) {
+                        title = announcement.translations[currentLang].title;
+                    }
+                    
+                    if (announcement.translations[currentLang].content) {
+                        content = announcement.translations[currentLang].content;
+                    }
+                }
+                
+                document.getElementById('editAnnouncementTitle').value = title;
+                document.getElementById('editAnnouncementContent').value = content;
+                
+                // Update language indicator
+                updateLanguageIndicators();
+                
+                // Target qiymatini o'rnatish
+                const targetSelect = document.getElementById('editAnnouncementTarget');
+                if (announcement.target && targetSelect) {
+                    targetSelect.value = announcement.target;
+                }
+                
+                // Modalni ochish
+                document.getElementById('editAnnouncementModal').style.display = 'block';
+            }
+        }
+        
+        // O'chirish modalni ko'rsatish
+        function showDeleteAnnouncement(id) {
+            localStorage.setItem('deletingAnnouncementId', id);
+            document.getElementById('deleteAnnouncementModal').style.display = 'block';
+        }
+
+        // E'lonni o'chirish
+        function deleteAnnouncement(id) {
+            let announcements = getFromStorage('announcements') || [];
+            announcements = announcements.filter(a => a.id !== id);
+            saveToStorage('announcements', announcements);
+            renderAnnouncements();
+        }
+        
+        // Qidirish funksiyasi
+        function filterAnnouncements() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.getElementById('announcementsList').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const title = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+                const content = rows[i].getElementsByTagName('td')[2].textContent.toLowerCase();
+                
+                if (title.indexOf(filter) > -1 || content.indexOf(filter) > -1) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+
+        // Function to update language indicators
+        function updateLanguageIndicators() {
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            const langNames = {
+                'uz': {
+                    add: 'O\'zbek tilida yaratish',
+                    edit: 'O\'zbek tilida tahrirlash'
+                },
+                'ru': {
+                    add: 'Создание на русском языке',
+                    edit: 'Редактирование на русском языке'
+                },
+                'en': {
+                    add: 'Creating in English',
+                    edit: 'Editing in English'
+                }
+            };
+            
+            const selectedLang = langNames[currentLang] || langNames['uz'];
+            document.getElementById('addLanguageIndicator').textContent = selectedLang.add;
+            document.getElementById('editLanguageIndicator').textContent = selectedLang.edit;
+        }
+        
+        // Make function available globally
+        window.updateLanguageIndicators = updateLanguageIndicators;
+    </script>
+</body>
+</html> 

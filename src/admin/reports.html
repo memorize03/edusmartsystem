@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hisobotlar | Admin Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../admin-language.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="adminTab">Administrator</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="students.html"><i class="material-icons">people</i> <span data-translate="students">O'quvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="teachers.html"><i class="material-icons">school</i> <span data-translate="teachers">O'qituvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="subjects.html"><i class="material-icons">menu_book</i> <span data-translate="subjects">Fanlar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="reports.html"><i class="material-icons">analytics</i> <span data-translate="reports">Hisobotlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="reports">Hisobotlar</h1>
+            <div class="action-buttons">
+                <button class="add-btn" onclick="document.getElementById('addReportModal').style.display='block'">
+                    <i class="material-icons">add</i> <span data-translate="addReport">Yangi hisobot</span>
+                </button>
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Qidiruv..." oninput="filterReports()">
+                    <i class="material-icons" onclick="filterReports()">search</i>
+                </div>
+            </div>
+            <div class="data-table">
+                <table id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th data-translate="id">ID</th>
+                            <th data-translate="reportName">NOMI</th>
+                            <th data-translate="reportType">TURI</th>
+                            <th data-translate="actions">AMALLAR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="reportsList">
+                        <!-- Hisobotlar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Report Modal -->
+            <div id="addReportModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="addNewReport">Yangi hisobot qo'shish</h2>
+                        <span class="close" onclick="document.getElementById('addReportModal').style.display='none'; document.getElementById('addReportForm').reset();">&times;</span>
+                    </div>
+                    <form id="addReportForm">
+                        <div class="form-group">
+                            <label for="reportName" data-translate="reportName">Hisobot nomi</label>
+                            <input type="text" id="reportName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportType" data-translate="reportType">Hisobot turi</label>
+                            <select id="reportType" name="type" required>
+                                <option value="attendance" data-translate="attendance">Davomat</option>
+                                <option value="performance" data-translate="performance">O'zlashtirish</option>
+                            </select>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('addReportModal').style.display='none'; document.getElementById('addReportForm').reset();" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Edit Report Modal -->
+            <div id="editReportModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="editReport">Hisobot ma'lumotlarini tahrirlash</h2>
+                        <span class="close" onclick="document.getElementById('editReportModal').style.display='none'">&times;</span>
+                    </div>
+                    <form id="editReportForm">
+                        <input type="hidden" id="editReportId" name="id">
+                        <div class="form-group">
+                            <label for="editReportName" data-translate="reportName">Hisobot nomi</label>
+                            <input type="text" id="editReportName" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="editReportType" data-translate="reportType">Hisobot turi</label>
+                            <select id="editReportType" name="type" required>
+                                <option value="attendance" data-translate="attendance">Davomat</option>
+                                <option value="performance" data-translate="performance">O'zlashtirish</option>
+                            </select>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('editReportModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                            <button type="submit" class="save-btn" data-translate="save">Saqlash</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Delete Confirmation Modal -->
+            <div id="deleteReportModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="confirmDeletion">O'chirishni tasdiqlang</h2>
+                        <span class="close" onclick="document.getElementById('deleteReportModal').style.display='none'">&times;</span>
+                    </div>
+                    <p data-translate="deleteReportConfirm">Ushbu hisobotni o'chirishni xohlaysizmi?</p>
+                    <div class="modal-buttons">
+                        <button type="button" class="cancel-btn" onclick="document.getElementById('deleteReportModal').style.display='none'" data-translate="cancel">Bekor qilish</button>
+                        <button type="button" class="delete-btn" id="confirmDeleteReport" data-translate="delete">O'chirish</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hisobotlar ro'yxatini yuklash
+            let reports = getFromStorage('reports') || [];
+            
+            // Boshlang'ich ma'lumotlarni saqlash
+            if (reports.length === 0) {
+                reports = [
+                    {
+                        id: 1,
+                        name: "Davomat hisoboti - Yanvar",
+                        type: "attendance"
+                    },
+                    {
+                        id: 2,
+                        name: "O'zlashtirish - 1-chorak",
+                        type: "performance"
+                    }
+                ];
+                saveToStorage('reports', reports);
+            }
+            
+            // Ro'yxatni ko'rsatish
+            renderReports();
+            
+            // Modal oynani tashqi click bilan yopish
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('addReportModal')) {
+                    document.getElementById('addReportModal').style.display = 'none';
+                    document.getElementById('addReportForm').reset();
+                }
+                if (event.target === document.getElementById('editReportModal')) {
+                    document.getElementById('editReportModal').style.display = 'none';
+                }
+                if (event.target === document.getElementById('deleteReportModal')) {
+                    document.getElementById('deleteReportModal').style.display = 'none';
+                }
+            });
+            
+            // Formani yuborish
+            document.getElementById('addReportForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const nameInput = document.getElementById('reportName');
+                const typeInput = document.getElementById('reportType');
+                
+                if (!nameInput.value.trim()) {
+                    alert(getTranslation('fillAllFields') || 'Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                const reports = getFromStorage('reports') || [];
+                
+                // Yangi ID olish
+                const nextId = reports.length > 0 ? Math.max(...reports.map(r => r.id)) + 1 : 1;
+                
+                const newReport = {
+                    id: nextId,
+                    name: nameInput.value.trim(),
+                    type: typeInput.value
+                };
+                
+                reports.push(newReport);
+                saveToStorage('reports', reports);
+                renderReports();
+                
+                // Modalni yopish
+                document.getElementById('addReportModal').style.display = 'none';
+                this.reset();
+            });
+            
+            // Tahrirlash formasi uchun
+            document.getElementById('editReportForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const reports = getFromStorage('reports') || [];
+                const reportId = parseInt(document.getElementById('editReportId').value);
+                const nameInput = document.getElementById('editReportName');
+                const typeInput = document.getElementById('editReportType');
+                
+                if (!nameInput.value.trim()) {
+                    alert(getTranslation('fillAllFields') || 'Iltimos, barcha maydonlarni to\'ldiring!');
+                    return;
+                }
+                
+                const updatedReport = {
+                    id: reportId,
+                    name: nameInput.value.trim(),
+                    type: typeInput.value
+                };
+                
+                // Hisobotni yangilash
+                const index = reports.findIndex(r => r.id === reportId);
+                if (index !== -1) {
+                    reports[index] = updatedReport;
+                    saveToStorage('reports', reports);
+                    renderReports();
+                }
+                
+                // Modalni yopish
+                document.getElementById('editReportModal').style.display = 'none';
+                this.reset();
+            });
+            
+            // O'chirish tugmasi uchun
+            document.getElementById('confirmDeleteReport').addEventListener('click', function() {
+                const reportId = parseInt(localStorage.getItem('deletingReportId'));
+                if (reportId) {
+                    deleteReport(reportId);
+                    document.getElementById('deleteReportModal').style.display = 'none';
+                    localStorage.removeItem('deletingReportId');
+                }
+            });
+            
+            // Placeholder attribute translation
+            document.getElementById('searchInput').setAttribute('placeholder', getTranslation('search') || 'Qidiruv...');
+        });
+
+        // Hisobotlar ro'yxatini ko'rsatish
+        function renderReports() {
+            const reports = getFromStorage('reports') || [];
+            const tbody = document.getElementById('reportsList');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            reports.forEach(report => {
+                const row = document.createElement('tr');
+                
+                // Hisobot turi uchun chiroyli ko'rinish
+                let typeText = getTranslation(report.type) || report.type;
+                if (report.type === 'attendance') typeText = getTranslation('attendance') || 'Davomat';
+                if (report.type === 'performance') typeText = getTranslation('performance') || 'O\'zlashtirish';
+                
+                row.innerHTML = `
+                    <td>${report.id}</td>
+                    <td>${report.name}</td>
+                    <td>${typeText}</td>
+                    <td class="actions">
+                        <button class="icon-btn edit" onclick="editReport(${report.id})">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="icon-btn delete" onclick="showDeleteReport(${report.id})">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Hisobotni tahrirlash
+        function editReport(id) {
+            const reports = getFromStorage('reports') || [];
+            const report = reports.find(r => r.id === id);
+            
+            if (report) {
+                document.getElementById('editReportId').value = report.id;
+                document.getElementById('editReportName').value = report.name;
+                document.getElementById('editReportType').value = report.type;
+                
+                // Modalni ochish
+                document.getElementById('editReportModal').style.display = 'block';
+            }
+        }
+        
+        // O'chirish modalni ko'rsatish
+        function showDeleteReport(id) {
+            localStorage.setItem('deletingReportId', id);
+            document.getElementById('deleteReportModal').style.display = 'block';
+        }
+
+        // Hisobotni o'chirish
+        function deleteReport(id) {
+            let reports = getFromStorage('reports') || [];
+            reports = reports.filter(r => r.id !== id);
+            saveToStorage('reports', reports);
+            renderReports();
+        }
+        
+        // Qidirish funksiyasi
+        function filterReports() {
+            const searchInput = document.getElementById('searchInput');
+            const filter = searchInput.value.toLowerCase();
+            const rows = document.getElementById('reportsList').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const name = rows[i].getElementsByTagName('td')[1].textContent.toLowerCase();
+                const type = rows[i].getElementsByTagName('td')[2].textContent.toLowerCase();
+                
+                if (name.indexOf(filter) > -1 || type.indexOf(filter) > -1) {
+                    rows[i].style.display = '';
+                } else {
+                    rows[i].style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html> 

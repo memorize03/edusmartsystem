@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="pageTitle">Sahifa Nomi</title>
+    <!-- Data.js faylini ulash (muhim) -->
+    <script src="../data.js"></script>
+    <script src="./language-selector.js"></script>
+    <style>
+        /* Til tanlash uchun uslublar */
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .language-selector select {
+            width: auto;
+            padding: 5px;
+            height: auto;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1 data-translate="pageHeader">Sahifa Sarlavhasi</h1>
+        
+        <!-- Til tanlash -->
+        <div class="language-selector">
+            <span data-translate="languageLabel">Til:</span>
+            <select id="language-select" onchange="changeLanguage(this.value)">
+                <option value="uz">O'zbekcha</option>
+                <option value="ru">Русский</option>
+                <option value="en">English</option>
+            </select>
+        </div>
+    </header>
+    
+    <main>
+        <!-- Tarjima qilinishi kerak bo'lgan matnlar -->
+        <p data-translate="paragraph1">Bu matn tarjima qilinadi</p>
+        
+        <!-- Tarjima qilinadigan placeholder -->
+        <input type="text" data-translate-placeholder="inputPlaceholder" placeholder="Kiriting...">
+        
+        <!-- Tarjima qilinadigan tugma -->
+        <button data-translate="button1">Tugma</button>
+    </main>
+    
+    <footer>
+        <p data-translate="copyright">© 2023 Maktab Boshqaruv Tizimi. Barcha huquqlar himoyalangan.</p>
+    </footer>
+    
+    <script>
+        // Sahifa yuklanganda tarjimalarni qo'llash
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tilni qo'llash
+            applyTranslations();
+            
+            // Bu sahifa uchun yangi tarjimalarni qo'shish
+            // Bu qismni data.js faylidagi allTranslations obyektiga ham qo'shing
+            /*
+            allTranslations.uz.pageTitle = "Sahifa Nomi";
+            allTranslations.uz.pageHeader = "Sahifa Sarlavhasi";
+            allTranslations.uz.paragraph1 = "Bu matn tarjima qilinadi";
+            allTranslations.uz.inputPlaceholder = "Kiriting...";
+            allTranslations.uz.button1 = "Tugma";
+            
+            allTranslations.ru.pageTitle = "Название страницы";
+            allTranslations.ru.pageHeader = "Заголовок страницы";
+            allTranslations.ru.paragraph1 = "Этот текст будет переведен";
+            allTranslations.ru.inputPlaceholder = "Введите...";
+            allTranslations.ru.button1 = "Кнопка";
+            */
+        });
+    </script>
+</body>
+</html> 

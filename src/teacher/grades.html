@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baholar | O'qituvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../update-students-translations.js"></script>
+    <script src="../teacher-language.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="teacherTab">O'qituvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="material-icons">people</i>
+                            <span data-translate="students">O'quvchilar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html">
+                            <i class="material-icons">event_note</i>
+                            <span data-translate="attendance">Davomat</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="grades.html">
+                            <i class="material-icons">grade</i>
+                            <span data-translate="myGrades">Baholar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html">
+                            <i class="material-icons">campaign</i>
+                            <span data-translate="announcements">E'lonlar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html">
+                            <i class="material-icons">logout</i>
+                            <span data-translate="logout">Chiqish</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="gradesJournal">Baholar jurnali</h1>
+            
+            <div class="filter-section">
+                <div class="form-group">
+                    <label data-translate="subject">Fan:</label>
+                    <select id="subjectFilter" onchange="filterGrades()">
+                        <option value="" data-translate="allSubjects">Barcha fanlar</option>
+                        <!-- Fanlar JavaScript orqali qo'shiladi -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label data-translate="class">Sinf:</label>
+                    <select id="classFilter" onchange="filterGrades()">
+                        <option value="" data-translate="allClasses">Barcha sinflar</option>
+                        <option value="9-A">9-A</option>
+                        <option value="9-B">9-B</option>
+                        <option value="10-A">10-A</option>
+                    </select>
+                </div>
+                <button class="action-btn" onclick="document.getElementById('addGradeModal').style.display='block'">
+                    <i class="material-icons">add</i>
+                    <span data-translate="newGrade">Yangi baho</span>
+                </button>
+            </div>
+            
+            <div class="data-table">
+                <table id="gradesTable">
+                    <thead>
+                        <tr>
+                            <th data-translate="id">ID</th>
+                            <th data-translate="studentName">O'QUVCHI</th>
+                            <th data-translate="class">SINF</th>
+                            <th data-translate="subject">FAN</th>
+                            <th data-translate="grade">BAHO</th>
+                            <th data-translate="date">SANA</th>
+                            <th data-translate="actions">AMALLAR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gradesList">
+                        <!-- Baholar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Modal oyna -->
+            <div id="addGradeModal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 data-translate="addNewGrade">Yangi baho qo'shish</h2>
+                        <span class="close" onclick="document.getElementById('addGradeModal').style.display='none'; document.getElementById('addGradeForm').reset();">&times;</span>
+                    </div>
+                    <form id="addGradeForm">
+                        <div class="form-group">
+                            <label data-translate="student">O'quvchi:</label>
+                            <select id="studentSelect" required>
+                                <option value="" data-translate="selectStudent">O'quvchini tanlang</option>
+                                <!-- O'quvchilar ro'yxati JavaScript orqali qo'shiladi -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="class">Sinf:</label>
+                            <select id="classSelect" required>
+                                <option value="9-A">9-A</option>
+                                <option value="9-B">9-B</option>
+                                <option value="10-A">10-A</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="subject">Fan:</label>
+                            <select id="subjectSelect" required>
+                                <option value="" data-translate="selectSubject">Fanni tanlang</option>
+                                <!-- Fanlar ro'yxati JavaScript orqali qo'shiladi -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="grade">Baho:</label>
+                            <select id="gradeValue" required>
+                                <option value="5">5 (A'lo)</option>
+                                <option value="4">4 (Yaxshi)</option>
+                                <option value="3">3 (Qoniqarli)</option>
+                                <option value="2">2 (Qoniqarsiz)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label data-translate="date">Sana:</label>
+                            <input type="date" id="gradeDate" required>
+                        </div>
+                        <div class="modal-buttons">
+                            <button type="submit" class="save-btn">
+                                <i class="material-icons">save</i>
+                                <span data-translate="save">Saqlash</span>
+                            </button>
+                            <button type="button" class="cancel-btn" onclick="document.getElementById('addGradeModal').style.display='none'; document.getElementById('addGradeForm').reset();">
+                                <i class="material-icons">close</i>
+                                <span data-translate="cancel">Bekor qilish</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sahifa yuklanganda
+        document.addEventListener('DOMContentLoaded', function() {
+            // Baholarni yuklash
+            loadGrades();
+            
+            // Fanlarni yuklash
+            loadSubjects();
+            
+            // O'quvchilarni yuklash
+            loadStudents();
+            
+            // Bahoni qo'shish formasini yuborish
+            document.getElementById('addGradeForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                submitGradeForm();
+            });
+            
+            // Tilni qo'llash
+            applyTranslations();
+            
+            // Special handling for the sidebar teacherTab element
+            const currentLang = getCurrentLanguage();
+            const sidebarTeacherElement = document.querySelector('.logo p[data-translate="teacherTab"]');
+            if (sidebarTeacherElement) {
+                let teacherText;
+                if (typeof getTranslation === 'function') {
+                    teacherText = getTranslation('teacher');
+                } else {
+                    // Fallback translations
+                    const translations = {
+                        uz: 'O\'qituvchi',
+                        ru: 'Учитель',
+                        en: 'Teacher'
+                    };
+                    teacherText = translations[currentLang] || 'O\'qituvchi';
+                }
+                
+                console.log(`Directly setting sidebar teacherTab to "${teacherText}"`);
+                sidebarTeacherElement.textContent = teacherText;
+                
+                // Set up a mutation observer to catch any changes to this element
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === "characterData" || mutation.type === "childList") {
+                            if (sidebarTeacherElement.textContent !== teacherText) {
+                                console.log("Sidebar teacher text changed unexpectedly, fixing...");
+                                sidebarTeacherElement.textContent = teacherText;
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(sidebarTeacherElement, { 
+                    characterData: true, 
+                    childList: true,
+                    subtree: true 
+                });
+            }
+            
+            // Ensure the language selector is visible
+            setTimeout(function() {
+                // Force language selector visibility
+                const languageSelector = document.getElementById('language-selector');
+                if (languageSelector) {
+                    languageSelector.style.display = 'flex';
+                    languageSelector.style.visibility = 'visible';
+                    languageSelector.style.opacity = '1';
+                }
+            }, 100);
+        });
+        
+        // Function to forcibly translate the sidebar teacher element
+        function forceTranslateSidebarTeacher() {
+            const sidebarTeacherElement = document.querySelector('.sidebar .logo p[data-translate="teacherTab"]');
+            if (!sidebarTeacherElement) return;
+            
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Direct hard-coded translations as a reliable fallback
+            const translations = {
+                uz: 'O\'qituvchi',
+                ru: 'Учитель',
+                en: 'Teacher'
+            };
+            
+            // Use hard-coded translations for reliability
+            const translation = translations[currentLang];
+            
+            // Only update if different from current text
+            if (sidebarTeacherElement.textContent !== translation) {
+                console.log('Forcing sidebar teacher to: ' + translation + ' (Language: ' + currentLang + ')');
+                sidebarTeacherElement.textContent = translation;
+                
+                // Apply visual refresh to ensure rendering
+                sidebarTeacherElement.style.display = 'none';
+                setTimeout(function() {
+                    sidebarTeacherElement.style.display = '';
+                }, 5);
+            }
+        }
+        
+        // Run immediately and periodically check for translation needs
+        (function() {
+            forceTranslateSidebarTeacher();
+            
+            // Add event listener for language selection changes
+            window.addEventListener('DOMContentLoaded', function() {
+                const languageSelect = document.getElementById('language-select');
+                if (languageSelect) {
+                    languageSelect.addEventListener('change', function() {
+                        setTimeout(forceTranslateSidebarTeacher, 10);
+                    });
+                }
+                
+                // Also listen for any custom language change events
+                document.addEventListener('languageChanged', function() {
+                    setTimeout(forceTranslateSidebarTeacher, 10);
+                });
+            });
+            
+            // Also check periodically
+            setInterval(forceTranslateSidebarTeacher, 1000);
+        })();
+        
+        // Baholar ro'yxatini ko'rsatish
+        function renderGrades(gradesList) {
+            const tbody = document.getElementById('gradesList');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // Joriy tilni olish
+            const currentLang = getCurrentLanguage();
+            
+            gradesList.forEach(grade => {
+                const row = document.createElement('tr');
+                
+                // Baho uchun chiroyli ko'rinish
+                let gradeClass;
+                switch(parseInt(grade.grade)) {
+                    case 5:
+                        gradeClass = 'grade-5';
+                        break;
+                    case 4:
+                        gradeClass = 'grade-4';
+                        break;
+                    case 3:
+                        gradeClass = 'grade-3';
+                        break;
+                    case 2:
+                        gradeClass = 'grade-2';
+                        break;
+                    default:
+                        gradeClass = '';
+                }
+                
+                row.innerHTML = `
+                    <td>${grade.id}</td>
+                    <td>${grade.studentName}</td>
+                    <td>${grade.class}</td>
+                    <td>${grade.subject}</td>
+                    <td class="${gradeClass}">${grade.grade}</td>
+                    <td>${formatDate(grade.date)}</td>
+                    <td class="actions">
+                        <button class="icon-btn edit" onclick="editGrade(${grade.id})" title="${getTranslation('editGrade')}">
+                            <i class="material-icons">edit</i>
+                        </button>
+                        <button class="icon-btn delete" onclick="deleteGrade(${grade.id})" title="${getTranslation('delete')}">
+                            <i class="material-icons">delete</i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Jadval sarlavhalarini yangilaymiz
+            const headers = document.querySelectorAll('th[data-translate]');
+            headers.forEach(header => {
+                const key = header.getAttribute('data-translate');
+                const translation = getTranslation(key);
+                if (translation) {
+                    header.textContent = translation;
+                }
+            });
+        }
+
+        // O'quvchilar ro'yxatini tanlovga qo'shish
+        function populateStudentDropdown() {
+            const select = document.getElementById('studentSelect');
+            if (!select) return;
+            
+            // Mavjud tanlovlarni tozalash (birinchi tanlov - "O'quvchini tanlang" qoladi)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            // O'quvchilarni localStorage'dan olish
+            const students = getFromStorage('students');
+            
+            // O'quvchilarni qo'shish
+            students.forEach(student => {
+                const option = document.createElement('option');
+                option.value = student.id;
+                option.text = student.name;
+                select.appendChild(option);
+            });
+        }
+
+        // Fanlar ro'yxatini tanlovga qo'shish
+        function populateSubjectDropdown() {
+            const select = document.getElementById('subjectSelect');
+            const filterSelect = document.getElementById('subjectFilter');
+            if (!select || !filterSelect) return;
+            
+            // Mavjud tanlovlarni tozalash (birinchi tanlov qoladi)
+            while (select.options.length > 1) {
+                select.remove(1);
+            }
+            
+            while (filterSelect.options.length > 1) {
+                filterSelect.remove(1);
+            }
+            
+            // Fanlarni localStorage'dan olish
+            const subjects = getFromStorage('subjects');
+            
+            // Fanlarni qo'shish
+            subjects.forEach(subject => {
+                // Qo'shish tanloviga
+                const option = document.createElement('option');
+                option.value = subject.name;
+                option.text = subject.name;
+                select.appendChild(option);
+                
+                // Filtr tanloviga
+                const filterOption = document.createElement('option');
+                filterOption.value = subject.name;
+                filterOption.text = subject.name;
+                filterSelect.appendChild(filterOption);
+            });
+        }
+
+        // Sanani chiroyli ko'rinishda ko'rsatish
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('uz-UZ');
+        }
+
+        // Filtrlar asosida baholarni filtrlash
+        function filterGrades() {
+            const subjectFilter = document.getElementById('subjectFilter').value;
+            const classFilter = document.getElementById('classFilter').value;
+            
+            // Baholarni localStorage'dan olish
+            const grades = getFromStorage('grades');
+            
+            let filteredGrades = grades;
+            
+            if (subjectFilter) {
+                filteredGrades = filteredGrades.filter(grade => grade.subject === subjectFilter);
+            }
+            
+            if (classFilter) {
+                filteredGrades = filteredGrades.filter(grade => grade.class === classFilter);
+            }
+            
+            renderGrades(filteredGrades);
+        }
+
+        // Bahoni tahrirlash
+        function editGrade(id) {
+            const grades = getFromStorage('grades');
+            const grade = grades.find(g => g.id === id);
+            if (grade) {
+                document.getElementById('studentSelect').value = grade.studentId;
+                document.getElementById('classSelect').value = grade.class;
+                document.getElementById('subjectSelect').value = grade.subject;
+                document.getElementById('gradeValue').value = grade.grade;
+                document.getElementById('gradeDate').value = grade.date;
+                
+                // Modalni ochish
+                document.getElementById('addGradeModal').style.display = 'block';
+                
+                // Formani jo'natganda eski bahoni o'chirish uchun
+                const form = document.getElementById('addGradeForm');
+                form.dataset.editId = id;
+            }
+        }
+
+        // Bahoni o'chirish
+        function deleteGrade(id) {
+            if (confirm('Haqiqatan ham bu bahoni o\'chirmoqchimisiz?')) {
+                window.deleteGrade(id); // data.js dagi funksiyani chaqirish
+                filterGrades();
+            }
+        }
+        
+        // Formani yuborish
+        document.getElementById('addGradeForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const studentSelect = document.getElementById('studentSelect');
+            const classSelect = document.getElementById('classSelect');
+            const subjectSelect = document.getElementById('subjectSelect');
+            const gradeValue = document.getElementById('gradeValue');
+            const dateInput = document.getElementById('gradeDate');
+            
+            if (!studentSelect.value || !classSelect.value || !subjectSelect.value || !gradeValue.value || !dateInput.value) {
+                alert('Iltimos, barcha maydonlarni to\'ldiring!');
+                return;
+            }
+            
+            // O'quvchi ismini olish
+            const studentOption = studentSelect.options[studentSelect.selectedIndex];
+            const studentName = studentOption.text;
+            
+            const newGrade = {
+                studentId: parseInt(studentSelect.value),
+                studentName: studentName,
+                class: classSelect.value,
+                subject: subjectSelect.value,
+                grade: gradeValue.value,
+                date: dateInput.value
+            };
+            
+            // Agar tahrirlash bo'lsa, eski bahoni o'chirish
+            if (this.dataset.editId) {
+                deleteGrade(parseInt(this.dataset.editId));
+                delete this.dataset.editId;
+            }
+            
+            // Yangi baho qo'shish
+            addGrade(newGrade);
+            filterGrades();
+            
+            // Modalni yopish
+            document.getElementById('addGradeModal').style.display = 'none';
+            this.reset();
+        });
+
+        // Sahifa yuklanganda
+        document.addEventListener('DOMContentLoaded', function() {
+            // Bugungi sanani o'rnatish
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayString = `${yyyy}-${mm}-${dd}`;
+            
+            document.getElementById('gradeDate').value = todayString;
+            
+            // O'quvchilar va fanlar ro'yxatini tanlovga qo'shish
+            populateStudentDropdown();
+            populateSubjectDropdown();
+            
+            // Baholar ro'yxatini ko'rsatish
+            filterGrades();
+            
+            // Modal oynani tashqi click bilan yopish
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('addGradeModal')) {
+                    document.getElementById('addGradeModal').style.display = 'none';
+                    document.getElementById('addGradeForm').reset();
+                }
+            });
+        });
+    </script>
+    <script src="../force-update-translations.js"></script>
+</body>
+</html> 

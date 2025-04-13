@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bosh sahifa | O'quvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../student-language.js"></script>
+    <style>
+        .main-content {
+            background-image: url('../images/student-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .dashboard-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 15px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-right: 15px;
+            color: #3498db;
+        }
+        
+        .stat-card:nth-child(2) i {
+            color: #2ecc71;
+        }
+        
+        .stat-card:nth-child(3) i {
+            color: #e74c3c;
+        }
+        
+        .stat-info h3 {
+            margin: 0;
+            font-size: 1rem;
+            color: #7f8c8d;
+        }
+        
+        .stat-info p {
+            margin: 5px 0 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        .dashboard-section {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        .dashboard-section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #f1f1f1;
+            padding-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .announcement-card {
+            background: #fff;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .announcement-card:hover {
+            transform: translateX(5px);
+        }
+        
+        .announcement-card h3 {
+            margin: 0 0 5px;
+            font-size: 1.1rem;
+        }
+        
+        .announcement-card p.date {
+            color: #7f8c8d;
+            font-size: 0.8rem;
+            margin: 0 0 10px;
+        }
+        
+        .announcement-card p.text {
+            margin: 0;
+            color: #34495e;
+            line-height: 1.4;
+        }
+        
+        .view-all {
+            display: inline-block;
+            margin-top: 10px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        
+        .view-all:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                flex-direction: column;
+            }
+            
+            .row {
+                flex-direction: column;
+            }
+            
+            .col {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+        
+        /* Animatsiya */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .dashboard-stats, .dashboard-section {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="studentTab">O'quvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item active">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="grades.html"><i class="material-icons">grade</i> <span data-translate="grades">Baholar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1><span data-translate="welcome">Xush kelibsiz</span>, <span id="studentName">O'quvchi</span>!</h1>
+            
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <i class="material-icons">grade</i>
+                    <div class="stat-info">
+                        <h3 data-translate="averageGrade">O'rtacha baho</h3>
+                        <p id="avgGrade">0.0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="material-icons">event_note</i>
+                    <div class="stat-info">
+                        <h3 data-translate="attendance">Davomatlar</h3>
+                        <p id="attendanceStatus">0/0</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="material-icons">campaign</i>
+                    <div class="stat-info">
+                        <h3 data-translate="newAnnouncements">Yangi e'lonlar</h3>
+                        <p id="newAnnouncements">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col">
+                    <div class="dashboard-section">
+                        <h2 data-translate="recentGrades">So'nggi baholar</h2>
+                        <div id="recentGrades">
+                            <!-- Baholar shu yerda ko'rsatiladi -->
+                        </div>
+                        <a href="grades.html" class="view-all" data-translate="viewAllGrades">Barcha baholarni ko'rish</a>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="dashboard-section">
+                        <h2 data-translate="recentAnnouncements">So'nggi e'lonlar</h2>
+                        <div id="recentAnnouncements">
+                            <!-- E'lonlar shu yerda ko'rsatiladi -->
+                        </div>
+                        <a href="announcements.html" class="view-all" data-translate="viewAllAnnouncements">Barcha e'lonlarni ko'rish</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add translations
+        const additionalTranslations = {
+            uz: {
+                welcome: "Xush kelibsiz",
+                averageGrade: "O'rtacha baho",
+                recentGrades: "So'nggi baholar",
+                viewAllGrades: "Barcha baholarni ko'rish",
+                noGrades: "Baholar mavjud emas",
+                noAnnouncements: "E'lonlar mavjud emas"
+            },
+            ru: {
+                welcome: "Добро пожаловать",
+                averageGrade: "Средняя оценка",
+                recentGrades: "Последние оценки",
+                viewAllGrades: "Посмотреть все оценки",
+                noGrades: "Нет оценок",
+                noAnnouncements: "Нет объявлений"
+            },
+            en: {
+                welcome: "Welcome",
+                averageGrade: "Average grade",
+                recentGrades: "Recent grades",
+                viewAllGrades: "View all grades",
+                noGrades: "No grades available",
+                noAnnouncements: "No announcements available"
+            }
+        };
+        
+        // Add these translations to the global translations
+        for (let lang in additionalTranslations) {
+            for (let key in additionalTranslations[lang]) {
+                if (!allTranslations[lang][key]) {
+                    allTranslations[lang][key] = additionalTranslations[lang][key];
+                }
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current student
+            const studentId = localStorage.getItem('currentStudentId');
+            if (!studentId) {
+                alert('Siz tizimga kirmagansiz!');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Get all student data
+            const students = getFromStorage('students') || [];
+            const currentStudent = students.find(s => s.id == studentId);
+            if (!currentStudent) {
+                alert('O\'quvchi ma\'lumotlari topilmadi!');
+                window.location.href = '../login.html';
+                return;
+            }
+            
+            // Update the student name
+            document.getElementById('studentName').textContent = currentStudent.name;
+            
+            // Baholari olish va hisobotni ko'rsatish
+            loadStudentGrades(studentId);
+            
+            // Davomat bo'yicha hisobot ko'rsatish
+            loadStudentAttendance(studentId);
+            
+            // So'nggi e'lonlar ko'rsatish
+            loadRecentAnnouncements();
+        });
+        
+        // Function to load student grades
+        function loadStudentGrades(studentId) {
+            const grades = getFromStorage('grades') || [];
+            const studentGrades = grades.filter(g => g.studentId == studentId);
+            
+            // Get current language for translations
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Get word for grade in current language
+            const gradeWord = {
+                'uz': 'Baho',
+                'ru': 'Оценка',
+                'en': 'Grade'
+            }[currentLang] || 'Baho';
+            
+            // O'rtacha bahoni hisoblash
+            if (studentGrades.length > 0) {
+                const sum = studentGrades.reduce((total, grade) => total + Number(grade.grade), 0);
+                const average = sum / studentGrades.length;
+                document.getElementById('avgGrade').textContent = average.toFixed(1);
+                
+                // So'nggi baholari ko'rsatish
+                const recentGrades = studentGrades.slice(0, 5);
+                const recentGradesContainer = document.getElementById('recentGrades');
+                recentGradesContainer.innerHTML = ''; // Clear existing content
+                
+                if (recentGrades.length > 0) {
+                    recentGrades.forEach(grade => {
+                        const date = new Date(grade.date);
+                        const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+                        
+                        // Get translated subject if available
+                        let subjectName = grade.subject;
+                        
+                        // Try to find a translated subject name
+                        const subjects = getFromStorage('subjects') || [];
+                        const subject = subjects.find(s => s.name === grade.subject);
+                        if (subject && subject.translations && subject.translations[currentLang]) {
+                            subjectName = subject.translations[currentLang];
+                        }
+                        
+                        const gradeElement = document.createElement('div');
+                        gradeElement.className = 'announcement-card';
+                        gradeElement.innerHTML = `
+                            <h3>${subjectName}</h3>
+                            <p class="date">${formattedDate}</p>
+                            <p class="text">${gradeWord}: <strong>${grade.grade}</strong></p>
+                        `;
+                        recentGradesContainer.appendChild(gradeElement);
+                    });
+                } else {
+                    const noGradesMessage = getTranslation('noGrades') || 'Baholar mavjud emas';
+                    recentGradesContainer.innerHTML = `<div class="no-data">${noGradesMessage}</div>`;
+                }
+            } else {
+                document.getElementById('avgGrade').textContent = '-';
+                const noGradesMessage = getTranslation('noGrades') || 'Baholar mavjud emas';
+                document.getElementById('recentGrades').innerHTML = `<div class="no-data">${noGradesMessage}</div>`;
+            }
+        }
+        
+        // Function to load student attendance
+        function loadStudentAttendance(studentId) {
+            const attendance = getFromStorage('attendance') || [];
+            const studentAttendance = attendance.filter(a => a.studentId == studentId);
+            
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Attendance labels in different languages
+            const attendanceLabels = {
+                uz: {
+                    present: 'Kelgan',
+                    absent: 'Kelmagan',
+                    ratio: 'ta / ',
+                    total: 'ta'
+                },
+                ru: {
+                    present: 'Присутствовал',
+                    absent: 'Отсутствовал',
+                    ratio: ' из ',
+                    total: ''
+                },
+                en: {
+                    present: 'Present',
+                    absent: 'Absent',
+                    ratio: ' out of ',
+                    total: ''
+                }
+            };
+            
+            const labels = attendanceLabels[currentLang] || attendanceLabels.uz;
+            
+            if (studentAttendance.length > 0) {
+                const present = studentAttendance.filter(a => a.status === 'present').length;
+                
+                // Format the attendance text depending on language
+                let attendanceText = '';
+                if (currentLang === 'uz') {
+                    attendanceText = `${present}${labels.ratio}${studentAttendance.length}${labels.total}`;
+                } else {
+                    attendanceText = `${present}${labels.ratio}${studentAttendance.length}`;
+                }
+                
+                document.getElementById('attendanceStatus').textContent = attendanceText;
+            } else {
+                document.getElementById('attendanceStatus').textContent = '0/0';
+            }
+        }
+        
+        // Function to load recent announcements
+        function loadRecentAnnouncements() {
+            const announcements = getFromStorage('announcements') || [];
+            const relevantAnnouncements = announcements.filter(a => a.target === 'students' || a.target === 'all');
+            const recentAnnouncements = relevantAnnouncements.slice(0, 3);
+            const announcementsContainer = document.getElementById('recentAnnouncements');
+            announcementsContainer.innerHTML = ''; // Clear existing content
+            
+            if (recentAnnouncements.length > 0) {
+                // Get current language for translations
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                recentAnnouncements.forEach(announcement => {
+                    const date = new Date(announcement.date);
+                    const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+                    
+                    // Get translated title and content if available
+                    let title = announcement.title;
+                    let content = announcement.content;
+                    
+                    // Check if announcement has translations
+                    if (announcement.translations && announcement.translations[currentLang]) {
+                        if (announcement.translations[currentLang].title) {
+                            title = announcement.translations[currentLang].title;
+                        }
+                        if (announcement.translations[currentLang].content) {
+                            content = announcement.translations[currentLang].content;
+                        }
+                    }
+                    
+                    const announcementElement = document.createElement('div');
+                    announcementElement.className = 'announcement-card';
+                    announcementElement.innerHTML = `
+                        <h3>${title}</h3>
+                        <p class="date">${formattedDate}</p>
+                        <p class="text">${content}</p>
+                    `;
+                    announcementsContainer.appendChild(announcementElement);
+                });
+            } else {
+                const noAnnouncementsMessage = getTranslation('noAnnouncements') || 'E\'lonlar mavjud emas';
+                announcementsContainer.innerHTML = `<div class="no-data">${noAnnouncementsMessage}</div>`;
+            }
+        }
+        
+        // Make functions available to the global scope for language switching
+        window.loadRecentAnnouncements = loadRecentAnnouncements;
+    </script>
+</body>
+</html> 

@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E'lonlar | O'qituvchi Panel</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../update-students-translations.js"></script>
+    <script src="../teacher-language.js"></script>
+    <style>
+        .main-content {
+            background-color: #f5f6fa;
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            padding: 20px;
+        }
+        
+        .announcements-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .add-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .add-button:hover {
+            background-color: #2980b9;
+        }
+        
+        .announcements-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .announcement-card {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .announcement-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-title {
+            margin: 0;
+            font-size: 18px;
+            color: #333;
+        }
+        
+        .card-metadata {
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        
+        .card-content {
+            padding: 20px;
+        }
+        
+        .card-text {
+            color: #555;
+            margin: 0 0 15px 0;
+            line-height: 1.5;
+        }
+        
+        .card-footer {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 20px;
+            border-top: 1px solid #eee;
+            gap: 10px;
+        }
+        
+        .card-button {
+            background: none;
+            border: none;
+            color: #777;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        
+        .card-button:hover {
+            background-color: #f5f5f5;
+        }
+        
+        .edit-button {
+            color: #3498db;
+        }
+        
+        .delete-button {
+            color: #e74c3c;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+        }
+        
+        .empty-icon {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        /* Language selector styles */
+        .language-selector-wrapper {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .language-selector {
+            display: flex;
+            align-items: center;
+            background: #fff;
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-selector label {
+            margin-right: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .language-selector select {
+            border: 1px solid #ccc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background-color: #fff;
+            font-size: 14px;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1050;
+            overflow: auto;
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 50px auto;
+            max-width: 600px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-title {
+            margin: 0;
+            font-size: 18px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #777;
+        }
+        
+        .modal-body {
+            padding: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-secondary {
+            background-color: #ecf0f1;
+            color: #7f8c8d;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #dfe6e9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="teacherTab">O'qituvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="material-icons">dashboard</i>
+                            <span data-translate="home">Bosh sahifa</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="index.html">
+                            <i class="material-icons">people</i>
+                            <span data-translate="students">O'quvchilar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html">
+                            <i class="material-icons">event_note</i>
+                            <span data-translate="attendance">Davomat</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="grades.html">
+                            <i class="material-icons">grade</i>
+                            <span data-translate="grades">Baholar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item active">
+                        <a href="announcements.html">
+                            <i class="material-icons">campaign</i>
+                            <span data-translate="announcements">E'lonlar</span>
+                        </a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html">
+                            <i class="material-icons">logout</i>
+                            <span data-translate="logout">Chiqish</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1 data-translate="announcements">E'lonlar</h1>
+            
+            <!-- Language selector visible at top-right -->
+            <div class="language-selector-wrapper">
+                <div class="language-selector">
+                    <label data-translate="languageLabel">Til:</label>
+                    <select id="language-select" onchange="changeLanguage(this.value)">
+                        <option value="uz">O'zbekcha</option>
+                        <option value="ru">Русский</option>
+                        <option value="en">English</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Announcements header with add button -->
+            <div class="announcements-header">
+                <div></div> <!-- Empty div for flex spacing -->
+                <button class="add-button" id="addAnnouncementBtn">
+                    <i class="material-icons">add</i>
+                    <span data-translate="newAnnouncement">Yangi e'lon qo'shish</span>
+                </button>
+            </div>
+            
+            <!-- Announcements grid -->
+            <div class="announcements-container" id="announcementsContainer">
+                <!-- Example announcement cards -->
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Ota-onalar yig'ilishi</h3>
+                        <div class="card-metadata">
+                            <span class="card-date">15.03.2025</span>
+                            <span class="card-target">9-A sinf</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Hurmatli ota-onalar, sizlarni 20-mart kuni soat 15:00 da maktabda bo'lib o'tadigan ota-onalar yig'ilishiga taklif qilamiz. Yig'ilishda o'quvchilarning yarim yillik natijalari muhokama qilinadi.</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-button edit-button">
+                            <i class="material-icons">edit</i>
+                            <span data-translate="edit">Tahrirlash</span>
+                        </button>
+                        <button class="card-button delete-button">
+                            <i class="material-icons">delete</i>
+                            <span data-translate="delete">O'chirish</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="announcement-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Matematika olimpiadasi</h3>
+                        <div class="card-metadata">
+                            <span class="card-date">10.03.2025</span>
+                            <span class="card-target">Barcha sinflar</span>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <p class="card-text">Maktabimizda matematika olimpiadasi o'tkaziladi. O'quvchilar 25-mart kuni soat 9:00 da 305-xonada to'planishi so'raladi. O'z daftarlar va qalam-ruchkalaringizni o'zingiz bilan olishni unutmang.</p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-button edit-button">
+                            <i class="material-icons">edit</i>
+                            <span data-translate="edit">Tahrirlash</span>
+                        </button>
+                        <button class="card-button delete-button">
+                            <i class="material-icons">delete</i>
+                            <span data-translate="delete">O'chirish</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Add/Edit Announcement Modal -->
+            <div class="modal" id="announcementModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" data-translate="newAnnouncement">Yangi e'lon qo'shish</h3>
+                        <button class="modal-close" id="closeModal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="announcementForm">
+                            <div class="form-group">
+                                <label for="announcementTitle" data-translate="title">Sarlavha:</label>
+                                <input type="text" class="form-control" id="announcementTitle" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="announcementTarget" data-translate="target">Kimga:</label>
+                                <select class="form-control" id="announcementTarget">
+                                    <option value="all" data-translate="allClasses">Barcha sinflar</option>
+                                    <option value="9A">9-A</option>
+                                    <option value="9B">9-B</option>
+                                    <option value="10A">10-A</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="announcementContent" data-translate="content">Matn:</label>
+                                <textarea class="form-control" id="announcementContent" required></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" id="cancelBtn" data-translate="cancel">Bekor qilish</button>
+                        <button class="btn btn-primary" id="saveBtn" data-translate="save">Saqlash</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set up the language selection based on stored preference
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the current language from localStorage or default to Uzbek
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Set the language dropdown to the current language
+            const languageSelect = document.getElementById('language-select');
+            if (languageSelect) {
+                languageSelect.value = currentLang;
+            }
+            
+            // Apply translations
+            applyTranslations();
+            
+            // Apply announcements-specific translations
+            applyAnnouncementsTranslations();
+            
+            // Make sure teacherTab is properly translated
+            forceTranslateSidebarTeacher();
+            
+            // Set up modal functionality
+            setupModal();
+        });
+        
+        // Function to change language
+        function changeLanguage(lang) {
+            // Store the selected language
+            localStorage.setItem('selectedLanguage', lang);
+            
+            // Apply translations
+            if (typeof applyTranslations === 'function') {
+                applyTranslations();
+            }
+            
+            // Apply announcements-specific translations
+            applyAnnouncementsTranslations();
+            
+            // Update teacher label
+            forceTranslateSidebarTeacher();
+            
+            // Refresh the page to apply all translations properly
+            location.reload();
+        }
+        
+        // Function to apply announcements-specific translations that might be missing from data.js
+        function applyAnnouncementsTranslations() {
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Define translations for announcements-specific elements
+            const announcementsTranslations = {
+                uz: {
+                    newAnnouncement: "Yangi e'lon qo'shish",
+                    title: "Sarlavha",
+                    target: "Kimga",
+                    content: "Matn",
+                    allClasses: "Barcha sinflar",
+                    edit: "Tahrirlash",
+                    delete: "O'chirish",
+                    cancel: "Bekor qilish",
+                    save: "Saqlash"
+                },
+                ru: {
+                    newAnnouncement: "Добавить новое объявление",
+                    title: "Заголовок",
+                    target: "Кому",
+                    content: "Текст",
+                    allClasses: "Все классы",
+                    edit: "Редактировать",
+                    delete: "Удалить",
+                    cancel: "Отмена",
+                    save: "Сохранить"
+                },
+                en: {
+                    newAnnouncement: "Add New Announcement",
+                    title: "Title",
+                    target: "Target",
+                    content: "Content",
+                    allClasses: "All Classes",
+                    edit: "Edit",
+                    delete: "Delete",
+                    cancel: "Cancel",
+                    save: "Save"
+                }
+            };
+            
+            // Apply translations to elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                
+                // Only apply if we have a translation for this key
+                if (announcementsTranslations[currentLang] && announcementsTranslations[currentLang][key]) {
+                    element.textContent = announcementsTranslations[currentLang][key];
+                }
+            });
+            
+            // Update placeholders based on language
+            document.querySelectorAll('[data-translate-placeholder]').forEach(element => {
+                const key = element.getAttribute('data-translate-placeholder');
+                if (announcementsTranslations[currentLang] && announcementsTranslations[currentLang][key]) {
+                    element.placeholder = announcementsTranslations[currentLang][key];
+                }
+            });
+        }
+        
+        // Function to forcibly translate the sidebar teacher element
+        function forceTranslateSidebarTeacher() {
+            const sidebarTeacherElement = document.querySelector('.logo p[data-translate="teacherTab"]');
+            if (!sidebarTeacherElement) return;
+            
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Direct hard-coded translations as a reliable fallback
+            const translations = {
+                uz: 'O\'qituvchi',
+                ru: 'Учитель',
+                en: 'Teacher'
+            };
+            
+            // Use hard-coded translations for reliability
+            const translation = translations[currentLang];
+            
+            // Only update if different from current text
+            if (sidebarTeacherElement.textContent !== translation) {
+                console.log('Forcing sidebar teacher to: ' + translation);
+                sidebarTeacherElement.textContent = translation;
+            }
+        }
+        
+        // Set up modal functionality
+        function setupModal() {
+            const modal = document.getElementById('announcementModal');
+            const addBtn = document.getElementById('addAnnouncementBtn');
+            const closeBtn = document.getElementById('closeModal');
+            const cancelBtn = document.getElementById('cancelBtn');
+            const saveBtn = document.getElementById('saveBtn');
+            
+            // Open modal
+            addBtn.addEventListener('click', function() {
+                modal.style.display = 'block';
+            });
+            
+            // Close modal functions
+            function closeModal() {
+                modal.style.display = 'none';
+                document.getElementById('announcementForm').reset();
+            }
+            
+            closeBtn.addEventListener('click', closeModal);
+            cancelBtn.addEventListener('click', closeModal);
+            
+            // Close when clicking outside the modal
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+            
+            // Save announcement
+            saveBtn.addEventListener('click', function() {
+                const title = document.getElementById('announcementTitle').value;
+                const target = document.getElementById('announcementTarget').value;
+                const content = document.getElementById('announcementContent').value;
+                
+                if (!title || !content) {
+                    alert('Please fill all required fields');
+                    return;
+                }
+                
+                // Here would be code to save the announcement to a database
+                // For now, we'll just close the modal
+                closeModal();
+                
+                // In a real app, you would call a function to update the UI with the new announcement
+            });
+        }
+    </script>
+    <script src="../force-update-translations.js"></script>
+</body>
+</html> 

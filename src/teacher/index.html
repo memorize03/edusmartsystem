@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>O'qituvchi Paneli</title>
+    <link rel="stylesheet" href="../styles.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <script src="../data.js"></script>
+    <script src="../language-selector.js"></script>
+    <script src="../update-students-translations.js"></script>
+    <script src="../teacher-language.js"></script>
+    <style>
+        .main-content {
+            background-image: url('../images/teacher-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+        
+        .dashboard-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-icon {
+            font-size: 36px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+        
+        .stat-card:nth-child(2) .stat-icon {
+            color: #2ecc71;
+        }
+        
+        .stat-card:nth-child(3) .stat-icon {
+            color: #e74c3c;
+        }
+        
+        .stat-card:nth-child(4) .stat-icon {
+            color: #f39c12;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        
+        .welcome-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .welcome-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+        
+        .welcome-section p {
+            color: #34495e;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .action-button {
+            display: flex;
+            align-items: center;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .action-button i {
+            margin-right: 8px;
+        }
+        
+        .action-button:hover {
+            background: #2980b9;
+        }
+        
+        .dashboard-sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .dashboard-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-section h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            font-size: 18px;
+        }
+        
+        .student-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .student-item:last-child {
+            border-bottom: none;
+        }
+        
+        .student-name {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .student-class {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .student-action {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .student-action button {
+            background: none;
+            border: none;
+            color: #3498db;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .student-action button:hover {
+            color: #2980b9;
+        }
+        
+        .recent-grades {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .grade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .grade-item:last-child {
+            border-bottom: none;
+        }
+        
+        .grade-info {
+            flex: 1;
+        }
+        
+        .grade-student {
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        
+        .grade-subject {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .grade-value {
+            font-weight: 700;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: white;
+        }
+        
+        .grade-5 {
+            background: #27ae60;
+        }
+        
+        .grade-4 {
+            background: #2ecc71;
+        }
+        
+        .grade-3 {
+            background: #f39c12;
+        }
+        
+        .grade-2, .grade-1 {
+            background: #e74c3c;
+        }
+        
+        .grade-date {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-left: 10px;
+        }
+        
+        .announcement-list {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+        
+        .announcement-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+        
+        .announcement-title {
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .announcement-date {
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+        
+        .announcement-item.high-priority .announcement-title {
+            color: #e74c3c;
+        }
+        
+        .announcement-item.medium-priority .announcement-title {
+            color: #f39c12;
+        }
+        
+        .dashboard-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-top: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .footer-info {
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        
+        .footer-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .footer-link {
+            color: #3498db;
+            font-size: 12px;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-link:hover {
+            color: #2980b9;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .welcome-section, .dashboard-stats, .dashboard-sections, .dashboard-footer {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        .stat-card {
+            animation: fadeIn 0.5s ease-out forwards;
+            animation-fill-mode: both;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* Ensure teacher text is visible with the correct translation - modified */
+        .sidebar .logo p[data-translate="teacherTab"] {
+            position: relative;
+            /* No transparent color */
+        }
+        
+        /* Remove the forced text overlay */
+        /* No ::after pseudo-element */
+        
+        /* Search bar styles */
+        .search-container {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: #f8f9fa;
+            border: 1px solid #e8e8e8;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 400px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+        }
+        
+        .search-box input {
+            border: none;
+            padding: 8px 15px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            background: transparent;
+            color: #333;
+        }
+        
+        .search-box button {
+            background: none;
+            border: none;
+            padding: 8px;
+            margin-right: 5px;
+            cursor: pointer;
+            color: #999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .search-box button:hover {
+            color: #666;
+        }
+        
+        .search-box input::placeholder {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="logo">
+                <h2 data-translate="systemTitle">Maktab Tizimi</h2>
+                <p data-translate="teacherTab" id="sidebarTeacherText">O'qituvchi</p>
+            </div>
+            <nav>
+                <ul>
+                    <li class="menu-item active">
+                        <a href="index.html"><i class="material-icons">dashboard</i> <span data-translate="home">Bosh sahifa</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="index.html"><i class="material-icons">people</i> <span data-translate="students">O'quvchilar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="attendance.html"><i class="material-icons">event_note</i> <span data-translate="attendance">Davomat</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="grades.html"><i class="material-icons">grade</i> <span data-translate="grades">Baholar</span></a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="announcements.html"><i class="material-icons">campaign</i> <span data-translate="announcements">E'lonlar</span></a>
+                    </li>
+                    <li class="menu-item logout">
+                        <a href="../login.html"><i class="material-icons">logout</i> <span data-translate="logout">Chiqish</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h1><span data-translate="welcome">Xush kelibsiz</span>, <span id="teacherName" data-translate="teacher">O'qituvchi</span>!</h1>
+            
+            <!-- Search bar section -->
+            <div class="search-container">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Qidiruv" data-translate-placeholder="search">
+                    <button id="searchButton">
+                        <i class="material-icons">search</i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="data-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th data-translate="studentId">ID</th>
+                            <th data-translate="fullName">ISM FAMILIYA</th>
+                            <th data-translate="class">SINF</th>
+                            <th data-translate="parentContact">TELEFON</th>
+                            <th data-translate="actions">AMALLAR</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsList">
+                        <!-- O'quvchilar ro'yxati JavaScript orqali qo'shiladi -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // O'quvchilar ro'yxatini ko'rsatish
+        function renderStudents(searchQuery = '') {
+            const students = getFromStorage('students') || [];
+            const tbody = document.getElementById('studentsList');
+            if (!tbody) return;
+            
+            tbody.innerHTML = '';
+            
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Filter students if search query is provided
+            const filteredStudents = searchQuery 
+                ? students.filter(student => 
+                    student.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    student.class.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    student.phone.includes(searchQuery))
+                : students;
+            
+            filteredStudents.forEach(student => {
+                const row = document.createElement('tr');
+                
+                // Check if student has translations
+                let studentName = student.name;
+                if (student.translations && student.translations[currentLang] && student.translations[currentLang].name) {
+                    studentName = student.translations[currentLang].name;
+                }
+                
+                row.innerHTML = `
+                    <td>${student.id}</td>
+                    <td>${studentName}</td>
+                    <td>${student.class}</td>
+                    <td>${student.phone}</td>
+                    <td class="actions">
+                        <button class="icon-btn info" onclick="viewStudent(${student.id})" title="${getTranslation('viewDetails')}">
+                            <i class="material-icons">info</i>
+                        </button>
+                        <button class="icon-btn grade" onclick="gradeStudent(${student.id})" title="${getTranslation('addGrade')}">
+                            <i class="material-icons">grade</i>
+                        </button>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+            
+            // Show message if no results found
+            if (filteredStudents.length === 0) {
+                const noResults = document.createElement('tr');
+                const message = getTranslation('noResultsFound') || 'Qidiruv bo\'yicha hech qanday natija topilmadi';
+                noResults.innerHTML = `<td colspan="5" style="text-align: center; padding: 20px;">${message}</td>`;
+                tbody.appendChild(noResults);
+            }
+        }
+        
+        // Set up search functionality
+        function setupSearch() {
+            const searchInput = document.getElementById('searchInput');
+            const searchButton = document.getElementById('searchButton');
+            
+            if (searchButton) {
+                // Search when button is clicked
+                searchButton.addEventListener('click', function() {
+                    renderStudents(searchInput.value.trim());
+                });
+            }
+            
+            if (searchInput) {
+                // Search when Enter key is pressed
+                searchInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        renderStudents(this.value.trim());
+                    }
+                });
+                
+                // Live search as user types (only trigger after 3+ characters or if empty)
+                searchInput.addEventListener('input', function() {
+                    if (this.value.trim().length >= 3 || this.value.trim() === '') {
+                        renderStudents(this.value.trim());
+                    }
+                });
+            }
+        }
+
+        // O'quvchi haqida to'liq ma'lumot
+        function viewStudent(id) {
+            const students = getFromStorage('students') || [];
+            const student = students.find(s => s.id === id);
+            if (student) {
+                // Get current language
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                // Check if student has translations
+                let studentName = student.name;
+                if (student.translations && student.translations[currentLang] && student.translations[currentLang].name) {
+                    studentName = student.translations[currentLang].name;
+                }
+                
+                // Get translated labels
+                const studentLabel = getTranslation('student') || "O'quvchi";
+                const classLabel = getTranslation('class') || "Sinf";
+                const phoneLabel = getTranslation('phone') || "Telefon";
+                
+                alert(`${studentLabel}: ${studentName}\n${classLabel}: ${student.class}\n${phoneLabel}: ${student.phone}`);
+            }
+        }
+
+        // O'quvchiga baho qo'yish
+        function gradeStudent(id) {
+            const students = getFromStorage('students') || [];
+            const student = students.find(s => s.id === id);
+            if (student) {
+                // Get current language
+                const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+                
+                // Check if student has translations
+                let studentName = student.name;
+                if (student.translations && student.translations[currentLang] && student.translations[currentLang].name) {
+                    studentName = student.translations[currentLang].name;
+                }
+                
+                const grade = prompt(`${studentName} uchun baho kiriting (1-5):`);
+                if (grade && !isNaN(grade) && grade >= 1 && grade <= 5) {
+                    // Yangi baho yaratish
+                    const today = new Date();
+                    const yyyy = today.getFullYear();
+                    const mm = String(today.getMonth() + 1).padStart(2, '0');
+                    const dd = String(today.getDate()).padStart(2, '0');
+                    const todayString = `${yyyy}-${mm}-${dd}`;
+                    
+                    // Baholar ro'yxatini olish
+                    let grades = getFromStorage('grades') || [];
+                    
+                    // Yangi ID olish
+                    const nextId = grades.length > 0 ? Math.max(...grades.map(g => g.id)) + 1 : 1;
+                    
+                    const newGrade = {
+                        id: nextId,
+                        studentId: student.id,
+                        studentName: student.name,
+                        class: student.class,
+                        subject: "Matematika", // Default fan
+                        grade: parseInt(grade),
+                        date: todayString
+                    };
+                    
+                    // Bahoni saqlash
+                    grades.push(newGrade);
+                    saveToStorage('grades', grades);
+                    
+                    alert(`${studentName} uchun ${grade} baho qo'yildi.`);
+                } else {
+                    alert('Noto\'g\'ri baho formati. Iltimos, 1 dan 5 gacha son kiriting.');
+                }
+            }
+        }
+
+        // Sahifa yuklanganda
+        document.addEventListener('DOMContentLoaded', function() {
+            renderStudents();
+            
+            // Setup search functionality
+            setupSearch();
+            
+            // Tarjimalarni qo'llash
+            applyTranslations();
+            
+            // Ensure teacher element is properly translated
+            const currentLang = getCurrentLanguage();
+            if (typeof getTranslation === 'function') {
+                const teacherNameElement = document.getElementById('teacherName');
+                if (teacherNameElement) {
+                    const teacherTranslation = getTranslation('teacher');
+                    if (teacherTranslation && teacherTranslation !== 'teacher') {
+                        teacherNameElement.textContent = teacherTranslation;
+                    }
+                }
+            }
+            
+            // Special handling for the sidebar teacherTab element
+            const sidebarTeacherElement = document.querySelector('.logo p[data-translate="teacherTab"]');
+            if (sidebarTeacherElement) {
+                let teacherText;
+                if (typeof getTranslation === 'function') {
+                    teacherText = getTranslation('teacher');
+                } else {
+                    // Fallback translations
+                    const translations = {
+                        uz: 'O\'qituvchi',
+                        ru: 'Учитель',
+                        en: 'Teacher'
+                    };
+                    teacherText = translations[currentLang] || 'O\'qituvchi';
+                }
+                
+                console.log(`Directly setting sidebar teacherTab to "${teacherText}"`);
+                sidebarTeacherElement.textContent = teacherText;
+                
+                // Set up a mutation observer to catch any changes to this element
+                const observer = new MutationObserver(function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        if (mutation.type === "characterData" || mutation.type === "childList") {
+                            if (sidebarTeacherElement.textContent !== teacherText) {
+                                console.log("Sidebar teacher text changed unexpectedly, fixing...");
+                                sidebarTeacherElement.textContent = teacherText;
+                            }
+                        }
+                    });
+                });
+                
+                observer.observe(sidebarTeacherElement, { 
+                    characterData: true, 
+                    childList: true,
+                    subtree: true 
+                });
+                
+                // Also set up an interval check as a backup
+                setInterval(function() {
+                    if (sidebarTeacherElement.textContent !== teacherText) {
+                        console.log("Periodic check: fixing sidebar teacher text");
+                        sidebarTeacherElement.textContent = teacherText;
+                    }
+                }, 500);
+            }
+        });
+    </script>
+    
+    <!-- Direct fix for teacher text translation -->
+    <script>
+        // Run immediately and ensure the sidebar teacher element is translated
+        (function() {
+            forceTranslateSidebarTeacher();
+            
+            // Add event listener for language selection changes
+            window.addEventListener('DOMContentLoaded', function() {
+                const languageSelect = document.getElementById('language-select');
+                if (languageSelect) {
+                    languageSelect.addEventListener('change', function() {
+                        setTimeout(forceTranslateSidebarTeacher, 10);
+                    });
+                }
+                
+                // Also listen for any custom language change events
+                document.addEventListener('languageChanged', function() {
+                    setTimeout(forceTranslateSidebarTeacher, 10);
+                });
+            });
+            
+            // Also check periodically
+            setInterval(forceTranslateSidebarTeacher, 1000);
+        })();
+        
+        // Function to forcibly translate the sidebar teacher element
+        function forceTranslateSidebarTeacher() {
+            const sidebarTeacherElement = document.querySelector('.sidebar .logo p[data-translate="teacherTab"]');
+            if (!sidebarTeacherElement) return;
+            
+            // Get current language
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Direct hard-coded translations as a reliable fallback
+            const translations = {
+                uz: 'O\'qituvchi',
+                ru: 'Учитель',
+                en: 'Teacher'
+            };
+            
+            // Use hard-coded translations for reliability
+            const translation = translations[currentLang];
+            
+            // Only update if different from current text
+            if (sidebarTeacherElement.textContent !== translation) {
+                console.log('Forcing sidebar teacher to: ' + translation + ' (Language: ' + currentLang + ')');
+                sidebarTeacherElement.textContent = translation;
+                
+                // Apply visual refresh to ensure rendering
+                sidebarTeacherElement.style.display = 'none';
+                setTimeout(function() {
+                    sidebarTeacherElement.style.display = '';
+                }, 5);
+            }
+        }
+    </script>
+    <script src="../force-update-translations.js"></script>
+</body>
+</html> 

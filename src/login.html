@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kirish | Maktab Boshqaruv Tizimi</title>
+    <script src="data.js"></script>
+    <script src="./language-selector.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        body {
+            background: #f5f6fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-image: url('images/school.png');
+            background-color: #f5f6fa;
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        
+        /* Orqa fon qoraytirish uchun */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: -1;
+        }
+        
+        .login-box {
+            max-width: 400px;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .login-header h1 {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        .tab-button {
+            flex: 1;
+            padding: 12px;
+            background: #f9f9f9;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #444;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        select {
+            height: 44px;
+            background: white;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #5a6ecc;
+        }
+        
+        .login-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        /* Animatsiyalar */
+        .tab-content {
+            transition: all 0.3s;
+        }
+        
+        @media (max-width: 480px) {
+            .login-box {
+                width: 95%;
+                padding: 20px;
+            }
+        }
+
+        .container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10%;
+            min-height: 100vh;
+        }
+
+        .school-logo {
+            width: 20%;
+        }
+
+        .school-logo img {
+            width: 100%;
+            height: 100%;
+        }
+        .login-box {
+            width: 50%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="school-logo">
+            <img src="./images/5.png" alt="png">
+        </div>
+        <div class="login-box">
+            <div class="login-header">
+                <h1 data-translate="systemTitle">Edu Smart System</h1>
+                <p data-translate="loginInstruction">Tizimga kirish uchun ma'lumotlarni to'ldiring</p>
+            </div>
+            
+            <div class="tab-buttons">
+                <button class="tab-button active" onclick="changeTab('admin')" data-translate="adminTab">Administrator</button>
+                <button class="tab-button" onclick="changeTab('teacher')" data-translate="teacherTab">O'qituvchi</button>
+                <button class="tab-button" onclick="changeTab('student')" data-translate="studentTab">O'quvchi</button>
+            </div>
+            
+            <form id="loginForm" onsubmit="return loginUser(event)">
+                <!-- Administrator kirishi -->
+                <div id="admin-tab" class="tab-content">
+                    <div class="form-group">
+                        <label for="admin-username" data-translate="loginLabel">Login:</label>
+                        <input type="text" id="admin-username" data-translate-placeholder="adminPlaceholder" placeholder="Admin" value="admin" required>
+                    </div>
+                </div>
+                
+                <!-- O'qituvchi kirishi -->
+                <div id="teacher-tab" class="tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="teacher-select" data-translate="selectTeacher">O'qituvchini tanlang:</label>
+                        <select id="teacher-select">
+                            <option value="" data-translate="selectOption">Tanlang</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- O'quvchi kirishi -->
+                <div id="student-tab" class="tab-content" style="display: none;">
+                    <div class="form-group">
+                        <label for="student-select" data-translate="selectStudent">O'quvchini tanlang:</label>
+                        <select id="student-select">
+                            <option value="" data-translate="selectOption">Tanlang</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password" data-translate="passwordLabel">Parol:</label>
+                    <input type="password" id="password" data-translate-placeholder="passwordPlaceholder" placeholder="Parol" value="12345" required>
+                </div>
+                
+                <button type="submit" class="submit-btn" data-translate="loginButton">Kirish</button>
+                </form>
+            
+            <div class="login-footer">
+                <p data-translate="copyright">© 2023 Maktab Boshqaruv Tizimi. Barcha huquqlar himoyalangan.</p>
+                <!-- Hidden language selector for internal use -->
+                <select id="language-select" style="display:none;">
+                    <option value="uz">O'zbekcha</option>
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+                
+                <!-- Small language switcher hidden at bottom -->
+                <div style="margin-top: 5px; font-size: 10px; opacity: 0.5;">
+                    <a href="#" onclick="changeLanguage('uz'); return false;">UZ</a> |
+                    <a href="#" onclick="changeLanguage('ru'); return false;">RU</a> |
+                    <a href="#" onclick="changeLanguage('en'); return false;">EN</a>
+                </div>
+            </div>
+             
+        </div>
+        
+    </div>
+    <script>
+        let currentTab = 'admin';
+        
+        // Tabni almashtirish
+        function changeTab(tab) {
+            // Aktiv tabni o'zgartirish
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            document.querySelector(`.tab-button:nth-child(${tab === 'admin' ? 1 : tab === 'teacher' ? 2 : 3})`).classList.add('active');
+            
+            // Tab contentni ko'rsatish/yashirish
+            document.getElementById('admin-tab').style.display = 'none';
+            document.getElementById('teacher-tab').style.display = 'none';
+            document.getElementById('student-tab').style.display = 'none';
+            document.getElementById(`${tab}-tab`).style.display = 'block';
+            
+            currentTab = tab;
+        }
+        
+        // Login jarayoni
+        function loginUser(event) {
+            event.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            const defaultPassword = '12345';
+            
+            // Parolni tekshirish
+            if (password !== defaultPassword) {
+                const errorMessage = getTranslation('invalidPassword');
+                alert(errorMessage);
+                return false;
+            }
+            
+            // Tab turiga qarab kirish
+            switch(currentTab) {
+                case 'admin':
+                    window.location.href = 'admin/index.html';
+                    break;
+                    
+                case 'teacher':
+                    const teacherId = document.getElementById('teacher-select').value;
+                    if (!teacherId) {
+                        const errorMessage = getTranslation('selectTeacherError');
+                        alert(errorMessage);
+                        return false;
+                    }
+                    localStorage.setItem('currentTeacherId', teacherId);
+                    window.location.href = 'teacher/index.html';
+                    break;
+                    
+                case 'student':
+                    const studentId = document.getElementById('student-select').value;
+                    if (!studentId) {
+                        const errorMessage = getTranslation('selectStudentError');
+                        alert(errorMessage);
+                        return false;
+                    }
+                    localStorage.setItem('currentStudentId', studentId);
+                    window.location.href = 'student/index.html';
+                    break;
+            }
+            
+            return false;
+        }
+        
+        // O'qituvchilar ro'yxatini yuklash
+        function loadTeachers() {
+            const select = document.getElementById('teacher-select');
+            const teachers = getFromStorage('teachers');
+            
+            if (teachers && teachers.length > 0) {
+                teachers.forEach(teacher => {
+                    const option = document.createElement('option');
+                    option.value = teacher.id;
+                    option.textContent = teacher.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        // O'quvchilar ro'yxatini yuklash
+        function loadStudents() {
+            const select = document.getElementById('student-select');
+            const students = getFromStorage('students');
+            
+            if (students && students.length > 0) {
+                students.forEach(student => {
+                    const option = document.createElement('option');
+                    option.value = student.id;
+                    option.textContent = student.name;
+                    select.appendChild(option);
+                });
+            }
+        }
+        
+        // Sahifa yuklanganda
+        document.addEventListener('DOMContentLoaded', function() {
+            // O'qituvchilar va o'quvchilar ro'yxatini yuklash
+            loadTeachers();
+            loadStudents();
+            
+            // Apply translations based on the stored language
+            applyCorrectLanguage();
+            
+            // Check URL parameters for language setting
+            const urlParams = new URLSearchParams(window.location.search);
+            const langParam = urlParams.get('lang');
+            if (langParam && ['uz', 'ru', 'en'].includes(langParam)) {
+                changeLanguage(langParam);
+            }
+        });
+        
+        // Function to change language manually
+        function changeLanguage(lang) {
+            if (['uz', 'ru', 'en'].includes(lang)) {
+                // Save the selected language to localStorage
+                localStorage.setItem('selectedLanguage', lang);
+                
+                // If the data.js changeLanguage function exists, call it
+                if (typeof window.changeLanguage === 'function') {
+                    try {
+                        window.changeLanguage(lang);
+                    } catch (e) {
+                        console.log('Error calling data.js changeLanguage:', e);
+                    }
+                }
+                
+                // Apply our specific translations
+                applyCorrectLanguage();
+                
+                // Update the hidden language selector
+                const langSelect = document.getElementById('language-select');
+                if (langSelect) {
+                    langSelect.value = lang;
+                }
+                
+                // Update HTML lang attribute
+                document.documentElement.lang = lang;
+            }
+        }
+        
+        // Function to force Uzbek language on all UI elements
+        function forceUzbekLanguage() {
+            // Set explicit Uzbek translations for key elements
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                
+                // Login page key elements
+                if (key === 'systemTitle') element.textContent = 'Edu Smart System';
+                if (key === 'loginInstruction') element.textContent = 'Tizimga kirish uchun ma\'lumotlarni to\'ldiring';
+                if (key === 'adminTab') element.textContent = 'Administrator';
+                if (key === 'teacherTab') element.textContent = 'O\'qituvchi';
+                if (key === 'studentTab') element.textContent = 'O\'quvchi';
+                if (key === 'loginLabel') element.textContent = 'Login:';
+                if (key === 'passwordLabel') element.textContent = 'Parol:';
+                if (key === 'loginButton') element.textContent = 'Kirish';
+                if (key === 'copyright') element.textContent = '© 2023 Maktab Boshqaruv Tizimi. Barcha huquqlar himoyalangan.';
+                if (key === 'selectTeacher') element.textContent = 'O\'qituvchini tanlang:';
+                if (key === 'selectStudent') element.textContent = 'O\'quvchini tanlang:';
+                if (key === 'selectOption') element.textContent = 'Tanlang';
+            });
+            
+            // Update the HTML lang attribute
+            document.documentElement.lang = 'uz';
+        }
+
+        // Function to apply translations based on selected language
+        function applyCorrectLanguage() {
+            // Get the current language from localStorage
+            const currentLang = localStorage.getItem('selectedLanguage') || 'uz';
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = currentLang;
+            
+            // Set translations based on the current language
+            const translations = {
+                uz: {
+                    systemTitle: 'Edu Smart System',
+                    loginInstruction: 'Tizimga kirish uchun ma\'lumotlarni to\'ldiring',
+                    adminTab: 'Administrator',
+                    teacherTab: 'O\'qituvchi',
+                    studentTab: 'O\'quvchi',
+                    loginLabel: 'Login:',
+                    passwordLabel: 'Parol:',
+                    loginButton: 'Kirish',
+                    copyright: '© 2023 Maktab Boshqaruv Tizimi. Barcha huquqlar himoyalangan.',
+                    selectTeacher: 'O\'qituvchini tanlang:',
+                    selectStudent: 'O\'quvchini tanlang:',
+                    selectOption: 'Tanlang'
+                },
+                ru: {
+                    systemTitle: 'Школьная Система',
+                    loginInstruction: 'Введите данные для входа в систему',
+                    adminTab: 'Администратор',
+                    teacherTab: 'Учитель',
+                    studentTab: 'Ученик',
+                    loginLabel: 'Логин:',
+                    passwordLabel: 'Пароль:',
+                    loginButton: 'Войти',
+                    copyright: '© 2023 Система управления школой. Все права защищены.',
+                    selectTeacher: 'Выберите учителя:',
+                    selectStudent: 'Выберите ученика:',
+                    selectOption: 'Выбрать'
+                },
+                en: {
+                    systemTitle: 'School System',
+                    loginInstruction: 'Enter your credentials to log in',
+                    adminTab: 'Administrator',
+                    teacherTab: 'Teacher',
+                    studentTab: 'Student',
+                    loginLabel: 'Login:',
+                    passwordLabel: 'Password:',
+                    loginButton: 'Login',
+                    copyright: '© 2023 School Management System. All rights reserved.',
+                    selectTeacher: 'Select teacher:',
+                    selectStudent: 'Select student:',
+                    selectOption: 'Select'
+                }
+            };
+            
+            // Apply translations to elements with data-translate attribute
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (translations[currentLang] && translations[currentLang][key]) {
+                    element.textContent = translations[currentLang][key];
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
